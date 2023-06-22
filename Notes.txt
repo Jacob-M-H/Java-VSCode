@@ -1,0 +1,331 @@
+Switch statements only work with int, short, byte, and char, and some enumerated types like String, Byte, Integer, Short.
+Q: Why is it limited?
+
+Scanner will read a whole line,
+thus if you scan for an integer,
+type in 18\n, for enter, it grabs the integer portion,
+leaving \n, so make sure to clear the scanner, just like in python or c++.
+
+
+Scanner like c++ can also read files and other things.
+
+
+The do loop,
+do{code...}while(condition) <-a variation of while loop, will always do the code at least once.
+
+For loops are similar to cpp, 
+for (int i =0; i<=10; i++){}
+
+Arrays:
+String[] cars ={"Camero"} <-string array with 1 value.
+Similar to cpp again.
+String[] cars = new String[1]; will reserve enough space for one element.
+
+String[][] matrix =new String[3][3]; <-a 2d array, this pattern continues.
+
+
+https://youtu.be/xk4_1vDrzzo?t=6810
+
+Access methods with a ., like String name, name.equals('bob'). etc.
+
+
+Wrapper class, allows you to use primitive dat atypes as reference data types.
+Reference data types contain useful methods (Like strings), and can be used with collections (ex.ArrayList)
+//primitive //Wrapper
+//-------------------
+//boolean    Boolean 
+//char       Character
+//int        Integer
+//double     Double 
+//etc.        etc.
+//autoboxing = automatic convrsion java compiler makes between primitives to corresponding Wrapper class
+//unboxing = reverse of autoboxing. Auto conversion of wrapper class to primitive
+
+NOTE: A reference data type is slower than primitives.<- Much slower.
+
+#This is autoboxingV, treat them like primitive values (if a ==true)
+Boolean a = true;
+Character b = '@';
+Integer c =123;
+Double d =3.14;
+String e = "Bro"; 
+//Reference data types always start with a capital character.
+
+
+-------------
+Array list, a resizable array, elements can be added and removed after compilation phase, store reference data types.
+ArrayList<String> = new ArrayList<String>(); <-need to import the java.util.ArrayList;
+You always use wrapper classes.
+
+Array list uses add and get, set, remove, clear. 
+
+2D Array Lists. 
+Dynamic list of lists. 
+import java.util.*; <-imports all the java utilities. 
+The 2D list uses the Array List itself along with another wrapper class.
+You can chain the methods for array lists and other collections.
+This is like Cpp.
+
+_____________
+for-each loop.
+Less steps (faster), more readable, less flexible.
+String[] animals = {"cat", "dog", "rat", "bird"};
+for (String i : animals) { //: stands for 'in' , read for each String 'in' array animals
+    System.out.println(i);
+}
+ArrayList<String> animals = new ArrayList<String>();
+animals.add(etc.. lazy to type);
+^Just the array list collection and it works as well.
+------------------------
+
+METHODS
+Outside our main loop, 
+
+static return-type method(arguments passed to method's parameters) {//static added just because we are calling from a static method (main in the example)
+    String.out.println("Hello "+argument)
+    //return result;
+}
+
+Overloading the methods is an option (Providing the same method but with different parameters).
+This works as each method get's its own method name +paramters =different method signatures.
+
+--------------------
+Printf method.
+optional to format/contorl/display text to console window.
+two arguemtns, format string + object/varaible/value
+% [flags] [precision] [width] [conversion-character]
+
+ 
+printf's have similar placeholder values, %c, %b, %s, %d (Int), %f (double/float), etc.
+
+Width field/flag set numbers characters. %10s means ten characters minimum. 
+a negative number with left justify the text, will come after the text.
+.2 is Precision field, so %.1f gives .0 for 100, so 100.0.
+
+[flags]
+adds an effect to output based on flag added to format pecifier
+-: left justify+ output a + or - symbol for a numeric value
+0: numeic values are zero-padded
+,: comma grouping seperator if numbers >1000
+-----------------------
+
+https://youtu.be/xk4_1vDrzzo?t=10175
+FINAL keyword in java
+
+Anything declared as final cannot be changed later in the program.
+Preceeds data type. 
+Common practice is when declared final the variable name is given all capitals.
+
+--------------------
+OOP - Part 2 of BroCode series.
+
+May either decalre in a different java file, or in the same file, so long as it's outside the current class.
+public class Example{
+    String exText="Hello World!";
+    int year = 2023;
+
+    void greet(){
+        System.out.println(exText);
+    }
+}
+
+Constructing the class:
+Example exampleClass = new Example();
+ 
+----------------------
+Constructor 
+public class Example{
+    String exText="Hello World!";
+    int year = 2023;
+
+    void greet(){
+        System.out.println(exText);
+    }
+    Example(String exampleText, int yearDate){
+        this.exText=exampleText; //NOTE 'this' is used, it is much like in cpp, but it makes sure the variable assigned is scoped correctly.
+        this.year = yearDate;
+    }
+}
+Constructor is a method like in cpp. 
+Example exampleClass = new Example("I'm using a constructor", 2023);
+This 'this' keyword doesn't seem as straightforward as the cpp version.
+It's similar to the 'self' in python. Anyways.
+
+We an also use an object's attributes within it's own class, we must use 'this'.
+
+
+-------------------
+Local vs Global variables.
+Local is inside a method, global is decalred outside of a method but within a class.
+This is similar to cpp, except it is in the context of everything in a class, rather than the file itself.
+
+-------------------
+Constructors can also be overloaded.
+-------------------
+toString method,
+returns a 'textually represents' an object.
+printing a object gives a memory address. 
+All objects inheret a toString() method, which is used implicitly when using a println object.
+Many people override the toString method for the text representation.
+-------------------
+Array of objects.
+int[] numbers = new int[3];
+Similarly
+Example[] exampleArray = new Example[3];
+
+-------------------
+Static keyword modifier. 
+Applies to variable/method/class [different video]. A single copy of this thing is shared between all of the classes.
+The class 'owns' the same variable/method. 
+
+Access with class name like a attribute. Example.exampleStatic,
+Can access with a speciifc variable of that class but it isn't recommended. 
+Static reference is what the Example.exampleStatic is demonstrating.
+-------------------
+Inheretence. 
+https://youtu.be/xk4_1vDrzzo?t=13717
+
+Parent class:
+public class Vehicle{}
+public class Car extends Vehicle{}
+
+The extend keyword is key. Just like cpp and python, the child class inherets the attributes and previous methods.
+The methods can be overridden however for the subclass I'm sure.
+
+----------------------
+Method overriding
+-Exactly as described above. Method with same attribtues in the parent class is declared in the child class, and the child class now overrides it.
+----------------------
+Super keyword.
+Keyword revers to the superclass (parent) of an object, very similar to the 'this' keyword.
+When makinga constructor for a subclass,
+if the attributes are defined in the superclass, we want to use the super keyword, for example
+super(name, age); This then calls the constructor of the superclass, with attribtues name and age,
+while we continue to use this.power or another attribute for the subclass in the subclasses respective constructor.
+This is important for correctness and perhaps compiling.
+
+Additionally, if hte parent class has a method, 
+then the subclass should use super to get the information from the parent class method, if we require an 'expansion' of that functiosn return/purpose.
+
+
+
+
+
+
+
+
+----------PART 3, BIG ENGINEERING DECISIONS 
+            AND SECURITY/CREATING READABLE CODE-----------  
+        
+
+
+
+------------------------------------------
+abstract keyword.
+Abstract classes cannot be instantianted, but subclass can be.
+Vehicle vehicle =new Vehicle();
+Car car =new Car();
+This helps prevent creating a class that is too abstract.
+By making a 'public abstract class Vehicle{}', this prevents 
+this class from being instantianted alone. It then MUST be accessed by subclasses.
+-
+abstract methods, 
+abstract void go(); <-abstract methods don't have a method,
+but it FORCES it to be defiend in the subclasses.
+Requires method overriding. 
+
+A good example I can think of is 'shape' and 'number of edges' which requires a return of an integer. So Square, Circle etc then have to return something (might not be correct but ensures consistency)
+--------------------------------------------
+Access modifiers
+public, no modifier, proectected, private.
+Access level chart would be useful. 
+ https://youtu.be/xk4_1vDrzzo?t=15028
+this might require NOTE: return, as this is beyond right now.
+Creating packages, packages are a collection of classes, while classes are packages of code.
+Packages create 2 lasses in each, new class 'A' and chekc public static void main. Then  'B', no check. 
+Then Asub in package 2. To inherit everything from package 1, requires an import from package 1. 
+
+No modifier: defautl access modifier is only seein inside the same package. 
+public: visible to any package in the project folder. Used in a lot of classes.
+So classes are visible in the same package (if not public? NOTE: Test this)
+But their code might nto be accessible without public in the same package (NOTE: Test this)?
+If they are public, the class can be created, but if hte variable is not public, then another package cannot see that code? (TEST THIS)
+WHATS DEFINITE: Anything with public is visible to any other package in the project.
+
+Protected: Accessible to a different class in a different package so long as it's a subclass of the class with the protected method/attribute.
+
+Private: only visible to the class itself. 
+NOTE: Question, what about subclasses/dervied classes?
+
+---------------------------------------------
+Encapsulation
+-attributes in a class being hidden or private.
+Can be accessed only thoruhg methods (getters and setters)
+We SHOULD make attirbeust private if don't have a reason to make htem public to make them public or protected.
+-I think it just removes hte ability to have direct access, and I think maybe keep attribtues hidden.
+------------------------------------------
+Copy objects
+Use getters and setters to make a copy.
+
+'car2 = car1' makes the same address, not a copy.
+Instead, make a copy method. 
+car2.copy(car1); 
+This then uses setters and getters to copy the contents.
+------------------------------------------
+Interface - a template that can be applied to a class.
+Similar ot inheritance, but specifies what a class has/must do.
+Classes can apply more than one interface, inheritance is limited to 1 super class.
+
+So it's like having a lot of parent classes.
+
+File new, interface. public interface Prey, Predator. 
+Can declare variables and methods, but those methods don't need a body.
+public interface Prey{
+    void flee();
+}
+public class Rabbit implements Prey{ //Theres a right click to add in all unimplemented classes
+    @Override
+    public void flee() {
+        System.out.println("Flee");
+    }
+}
+
+To implement multiple, Prey,Predator, they are sperated by a comma only.
+
+NOTE/QUESTION/FUTURE:What happens if both Prey and Predator have the same method name and arguments? Is there a way to tell if a thing has a particualr interface?
+-------------------------------------------
+Polymorphism in Java.
+https://youtu.be/xk4_1vDrzzo?t=16900
+The ability of an object to identify as more than one type.
+Vehicle parent of Boat/Bike/Car.
+Car[] racers ={car, bike, boat} doesn't work,
+however if it extends as a vehicle, we can chagne data type as a vehicle.
+Vehicle[] racers ={car, bike, boat}
+
+---------------------------------------------
+Dynamic polymorphism <-ability to be multiple data types during runtime.
+Example is creating a parent class. Then scans the user's response. Then the instance of the parent class is assigned a 'new Subclass();'.
+This is interesting.
+-----------------------------------------------
+Exception handling
+Events that happen during the program that disrupts normal flow of instructions.
+
+In danger code surround it with try{}, then follow with catch('type of exception' 'var name'){}
+And finally{} which will always run after try, even if an exception happens.
+Also we can catch general exceptions with the 'Exception' exception.
+NOTE: This is great for closing prompts or files before exiting a gui aciton.
+
+-----------------------------------------------
+File class in Java.
+----------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
