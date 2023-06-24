@@ -283,7 +283,7 @@ Can declare variables and methods, but those methods don't need a body.
 public interface Prey{
     void flee();
 }
-public class Rabbit implements Prey{ //Theres a right click to add in all unimplemented classes
+public class Rabbit implements Prey{ //Theres a right click to add in all unimplemented classes [POST:Methods?]
     @Override
     public void flee() {
         System.out.println("Flee");
@@ -318,6 +318,22 @@ NOTE: This is great for closing prompts or files before exiting a gui aciton.
 -----------------------------------------------
 File class in Java.
 ----------------------------------------------
+File writter class in Java.
+Will need try and catch blocks. Write method which will take a string.
+Then close the writer after writing. Append will add things to the end of hte files.
+
+----------------------------------------------
+File Reader class in Java.
+Reads file as a stream of characters 1 by 1. read() returns int value which contains the byte value. Whe nread() returns -1, there is no more data t oread.
+Also try and catch block for the reader.
+---------------------------------------------
+Audio reader in Java.
+-uses wav files, not mp4/mp3.
+Uses the AudioInputStream, and AudioSystem class. 
+Clip also is a class I guess.
+Program needs to remain open for hte clip to play, for example like a gui's 'X', or a user input wait while loop.
+
+---------------------------------------------
 
 
 
@@ -325,6 +341,183 @@ File class in Java.
 
 
 
+PART 3 GUI IN JAVA
+
+----------------------------------------------
+Jframes in Java. 
+Jframe is a GUI window to add components to.
+-size, visibility, title, default operations (close, min, max?),
+-resize flags, Icon of frame [use ImageIcon class],
+-frame color/Pane, background,  
+File, new class, makes a subclass of Jframe, other way to create a Jframe,
+basically makes a preset frame, and he gets rid of hte Jframe declaration,
+and edit replace frame. with this., then he creates an instance of the 'MyFrame' class.
+Neat.
+If you don't plan on using a name of the variable you can just do 'new Frame' but that seems odd.
+---------------------------------------------
+JLabel - Gui display area for string of text an image or both.
+can also add a ImageIcon. 
+Java likes to place string on right side of Image,
+there's set horizontal and set vertical. Can also do borders,
+Also labels seem to be holding both an Icon and text, so it's like a pyramid, you can change the things in the label's positions, then place the labels positon on the frame.
+
+'Default layout manager' We can manually set the size and placement of hte label....
+Layout manager usually border default. 
+
+FUTURE/NOTE: This will ikely need to be revisited and experimented.
+
+Pack function of frames. Will resize the size of hte frame to accomodatethe  size of componenets.
+--------------------------------------------
+JPanels in Java. - GUI componenet that functiosn as a container to hold other components.
+
+--------------------------------------------
+Buttons in Java
+--------------------------------------------
+Border layout managers
+-North, South, Center, East, West.
+--------------------------------------------
+FlowLayout in Java.
+-Places componenets in a row sized at prefered size. If horizontal layout too small, flowlayout class uses next avaialble row.
+--------------------------------------------
+grid layouts in Java.
+GridLayout manager -places components in grid of cells which takes all available space iwthin it's cell, and each cell is the same size.
+
+--------------------------------------------
+JLayeredPane -swing container, allows a depth basically. 
+Can stack components on top or below one another.
+-Theres a visual, default_.pallet->modal->PopUp->Drag. 
+-we can specify which layer to add things. 
+-shortcut, add a number associated number wit heach layer, there's a 0 for default, basically Integer.valueOf(0); for default layer. [when adding a pane]
+
+--------------------------------------------
+Open new window using Java Swing.
+If only want there to be one window, frame.dispose(); which would close out of the frame of hte launch page.
+I see. Create an instance of the window and then instance it when a button is pressed, etc.
+Require a way to trigger the instance.
+--------------------------------------------
+Dialouge boxes in Java.
+-JOptionPane
+--------------------------------------------
+JTextField, GUI textbox componeent that can be used to add, set, or get text.
+--------------------------------------------
+JCheckBox, GUI check box.
+--------------------------------------------
+JRadioButton - one or more butons in a grouping which may only select 1 in a group.
+--------------------------------------------
+JComboBox - a GUI, combines a button or ediable field and a dro pdown list.
+--------------------------------------------
+JSliders in Java.
+--------------------------------------------
+Progress Bar - visual aid ot let user know an operaiton is progressing.
+--------------------------------------------
+JMenuBar <-this is good stuff!
+Instead of adding to the frame, you set it. Then add the menus.
+then each JMenu add to the JMenuBar.
+Then add each menu item to each JMenu (respective to the drop down you want).
+
+Action listner interface added to each menu item. Thesee are added to each JMenuItem.
+And I think you add 'this' if it's in the class. This should be returned to later (NOTE/FUTURE)
+
+We can also add keyboard shortcuts to menu items. 'setMnemonic'.
+For keyevents, I think the VK_E means Alt+E...
+
+We can also set the image icons for those file items.
+
+--------------------------------------------
+JFileChooser -Gui mechanism for letting a user choose a file (useful for opening or saving a file)
+uses fileChooser, JFileChooser(); and you use the .showOpenDialog(null); method. 
+If the response is 0 (the return value), uh he gets a bit choppy with the explaination.
+Looks like JFileChooser has macros like 'APPROVE_OPTION', which he uses to obtain the selected file and then obtains the absolute path.
+
+We can also set the fileChoosers directory. 
+Trick for putting the file chooser in the current directory you can use '.'.
+-------------------------------------------
+Color chooser
+https://youtu.be/xk4_1vDrzzo?t=31348
+
+-------------------------------------------
+KeyListener. <-No layout manager since he shows us how to move htings with the keyboard.
+Now the frame will respond to keypresses. 
+-------------------------------------------
+MouseListener <-listens to mouse events. applying to the frame vs the listener matters.
+-------------------------------------------
+Drag and Drop <- He takes an image and drags it accross the window.
+-------------------------------------------
+Keybinding in Java
+-------------------------------------------
+2D graphics in Java.
+Graphics2D is hte class he uses, and does etPAint, setPAint, draw's etc other arguments.
+-------------------------------------------
+2D Animations in Java.
+-------------------------------------------
+
+
+
+
+
+Part 4 : ADVANCED CONTROL TECHNIQUES
+
+--------------------------------------------
+Generics in Java, enables types (classes and interfaces) to be parameters when definintnig:
+classes, interfaces, and methods. 
+A benefit is to eliminate the need to create multiple versions
+of methods or classes for various dat atypes. Use 1 versio nfor all reference data types.
+
+Generics are similar to templates in cpp.
+
+public static <Thing> void displayArray(Think[] array)
+We can limit the generics by something called 'bounded parameters'
+It can also return something generic. People like using 'P' instead of 'Thing'.
+So isntead of void, you can also use Thing.
+We bound it using 'extends 'parent class'', and then anything that is an instance of the super class or a subclass of that parent class will work but I believe nothing else.
+NOTE/FUTURE-test this around.
+
+-------------------------------------------
+
+Serializations/deserialization , converts a object into a byte stream, etc.
+Can be sent over a network or saved as a file, Could be saved as a platform indpenednet file.
+Intersting.
+
+.ser object.
+Steps to serialize
+1. your object class should implement Seralizable interface
+2. Add import java.io.Serializable;
+3. FileOutputStream fileOut = new FileOutputStream (file path)
+4. ObjectOutputStream out = new ObjecTOutputStream(fileOut);
+5. out.writeObjecT(objectName)
+6. out.close(); fileOut.close;
+
+Steps to Deserialize
+1. declare your object ( don't instantiate)
+2. Your class should implement Serializable interface
+3. Add import Java.io.Serializable; 
+4. FileInputStream fileIn = new FileInputStream(file path);
+5. OutputInputStream in = new ObjectInputStream(fileIn);
+6. objectName=(Class) in.readObject();
+7. in.close(); fileIn.close();
+
+---------------------------------------------------------
+Advanced stuff. Serialization stuff.
+Any children will also implment Serializable. 
+Static fields are not serialized (they belong ot the class, not individual object)
+the classes' defintion (class file) itslef is not recorded, cast it as the object type.
+Fields declared as 'transient' aren't serialized, they're ignored (example like a password)
+SerialVersionUID is a unique version ID.
+https://youtu.be/xk4_1vDrzzo?t=39051
+
+Serial and Deserial classes should match (see his comment on transient).
+
+
+serial versions are useful it seems like for projects and such.
+FUTURE/NOTE: return to test this stuff, and pay greater attention.
+-------------
+TimerTasks
+-executes a task once or more by a timer. A  timer as a facility for threads to schedule tasks for future execution in a background thread.
+(Seems like an autocorrect or spell check implmentation is possible).
+
+
+------------
+Threads : https://youtu.be/xk4_1vDrzzo?t=40143
 
 
 
