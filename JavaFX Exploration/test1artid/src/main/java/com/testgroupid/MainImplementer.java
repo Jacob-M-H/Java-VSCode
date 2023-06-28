@@ -1,7 +1,9 @@
 package com.testgroupid;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,7 +21,9 @@ import javafx.scene.text.Text;
 //import javafx.scene.Parent; 
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 
 
@@ -152,12 +156,37 @@ public class MainImplementer extends Application{
         
         //Set up the Scene
         //Stage stage=new Stage();  
-        Group root = new Group(); //Note there are different root nodes, FUTURE.
         
+
+        //Root stuff
+             
+            //Root node based on fxml file! 
+            System.out.println("Try loading test Main fxml!");
+            //Parent root=FXMLLoader.load(getClass().getResource("C:/Users/thebl/Java VSCode/JavaFX Exploration/test1artid/src/main/resources/com/testgroupid/testMain.fxml"));
+            try{
+            //System.out.println("Get Path to fxml");
+            //Path path = new File(getClass().getResource("/primary.fxml").getFile()).toPath();
+            //System.out.println("Path found: "+path.toString());
+
+            Parent root=FXMLLoader.load(getClass().getResource("C:/Users/thebl/Java VSCode/JavaFX Exploration/test1artid/src/main/resources/com/testgroupid/primary.fxml"));
+            System.out.println("Loaded!");
+
+            }
+            catch(Exception e){
+                e.printStackTrace();
+                System.out.println("Failed!");
+                //KEEP: (comment out when above works.)
+                 //Group root = new Group(); //Note there are different root nodes, FUTURE.
+            
+            }
+        Group root = new Group(); //Note there are different root nodes, FUTURE.
+            
+            
+
         //Scene defaults
-        int sceneWidth = 420; //The size of the stage takes priority, thus these values are less important to me.
-        int sceneHeight = 420;
-        Color defaultSceneColor =Color.BLACK;
+            int sceneWidth = 420; //The size of the stage takes priority, thus these values are less important to me.
+            int sceneHeight = 420;
+            Color defaultSceneColor =Color.BLACK;
 
         
         Scene scene = new Scene(root, sceneWidth, 

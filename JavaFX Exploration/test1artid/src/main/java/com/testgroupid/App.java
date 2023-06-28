@@ -1,4 +1,4 @@
-/*
+/* 
 package com.testgroupid;
 
 import javafx.application.Application;
@@ -8,15 +8,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
- */
+*/
 
 
 /**
  * JavaFX App
  */
 
-
-/*
+/* 
 public class App extends Application {
 
     private static Scene scene;
@@ -41,5 +40,4 @@ public class App extends Application {
         launch();
     }
 
-} 
-*/
+} */
