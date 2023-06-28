@@ -31,3 +31,17 @@ After compiling, you can see all variables and threads in run/debug view.
 FUTURE:https://medium.com/@cancerian0684/what-are-four-basic-principles-of-object-oriented-programming-645af8b43727
 
 
+
+Note on the bliping of images.
+    6/25/23, spent last night and this morning thinking about low level placing of objects on the screen - since I will/have been busy tonight. Decided that blipping a matrix onto the screen makes sense, and the arbitrary/precision values held by each object [to ensure mathematical alignment, but this itself needs to be re-evaluated].
+    The rotation of values should happen through formulas, not matrix problems. 
+    The rotation of objects around a central point has a test formula to try eventually.Perhaps will make a moc-up of the rotation of an object over a matrix with inputted values.
+    Tomorrow JavaFX/Maven will be the primary focus.
+    I will plot the path of study tomorrow first, and see if I need Maven, or if I can slide by with just JavaFX for now.
+    If I require Maven, I'll try to disect it's 'tutorial' document, otherwise I'll figure out how to inport JavaFX or something similar.
+    
+    6/26/23 From 8 to 9:20 pm I spent looking for a half decent Maven tutorial, or breakdown. From what I gathered over a few pages of notes is that Maven seems to be related to fullstack, is designed to easily package and borrrow code, and organize resources through set conventions.
+    The test folder for my purposes isn't super required, so I will investigate that as a project develops, or I hit a road block that prevents my progress.
+    Currently, I'll see about making a hello world program through Maven's src/main/java, and get rid of everything else I can. 
+    Then, once I confirm I can make things run in Maven, and the general features a bit more than I currently do, I'll start making some test JavaFX applications.
+    

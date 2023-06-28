@@ -1,0 +1,10 @@
+
+Using JavaFX:
+    https://www.javatpoint.com/javafx-tutorial
+
+BroCode JavaFX:
+    https://youtu.be/As7TEjqJ3Ao?list=PLZPZq0r_RZOM-8vJA3NQFZB7JroDcMwev&t=459
+
+
+FXML Java, thenewboston.
+    https://www.youtube.com/watch?v=K7BOH-Ll8_g
