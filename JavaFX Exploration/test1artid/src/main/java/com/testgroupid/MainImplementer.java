@@ -1,5 +1,7 @@
 package com.testgroupid;
 
+import java.io.IOException;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -148,7 +150,12 @@ public class MainImplementer extends Application{
     }
     
     
-     
+    
+    private static Parent loadFXML(String fxml) throws IOException {//From App.java Maven JavaFX sample project.
+        FXMLLoader fxmlLoader = new FXMLLoader(MainImplementer.class.getResource(fxml + ".fxml"));
+        //Note if this was not a static, FXMLLoader.load(getClass().getResource(fxml+".fxml")); would work too. 
+        return fxmlLoader.load();
+    }
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
     public void start(Stage stage) throws Exception{ //Stage primaryStage) { //throws Exception {
@@ -166,33 +173,21 @@ public class MainImplementer extends Application{
             //Root node based on fxml file! 
             System.out.println("Try loading test Main fxml!");
             //Parent root=FXMLLoader.load(getClass().getResource("C:/Users/thebl/Java VSCode/JavaFX Exploration/test1artid/src/main/resources/com/testgroupid/testMain.fxml"));
-        Parent root =null;
-        Parent root2 =null;
+        Parent root =null; 
         String fxml = "testMain";
 
             try{ 
-            System.out.println("Try to disect");
-             root2 = FXMLLoader.load(getClass().getResource(fxml+".fxml"));
-            System.out.println("Okay");
+             root=loadFXML(fxml);
             
             }
             catch(Exception e){
                 e.printStackTrace();
-                System.out.println("Failed 1!");  
+                System.out.println("Failed to load desired fxml!");  
                 //KEEP: (comment out when above works.)
-                //Group root = new Group(); //Note there are different root nodes, FUTURE.
-            
+                //Group root = new Group(); //Note there are different root nodes, FUTURE. 
             }
-        
            
-            System.out.println("FXMLLoader");
-            FXMLLoader fxmlLoader = new FXMLLoader(MainImplementer.class.getResource(fxml+".fxml"));
-            System.out.println("FXMLLoader.load");
-            root = fxmlLoader.load();
-            //Parent root=FXMLLoader.load(getClass().getResource("C:/Users/thebl/Java VSCode/JavaFX Exploration/test1artid/src/main/resources/com/testgroupid/primary.fxml"));
-            System.out.println("Loaded!");
-            
-            //Group root = new Group(); //Note there are different root nodes, FUTURE.
+             
             
             
 
