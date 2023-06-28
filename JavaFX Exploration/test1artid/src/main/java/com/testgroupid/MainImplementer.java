@@ -21,9 +21,9 @@ import javafx.scene.text.Text;
 //import javafx.scene.Parent; 
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
+//import java.io.File;
+//import java.io.IOException;
+//import java.nio.file.Path;
 
 
 
@@ -146,6 +146,9 @@ public class MainImplementer extends Application{
 
         return root;
     }
+    
+    
+     
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
     public void start(Stage stage) throws Exception{ //Stage primaryStage) { //throws Exception {
@@ -167,19 +170,26 @@ public class MainImplementer extends Application{
             //System.out.println("Get Path to fxml");
             //Path path = new File(getClass().getResource("/primary.fxml").getFile()).toPath();
             //System.out.println("Path found: "+path.toString());
-
-            Parent root=FXMLLoader.load(getClass().getResource("C:/Users/thebl/Java VSCode/JavaFX Exploration/test1artid/src/main/resources/com/testgroupid/primary.fxml"));
+            String fxml = "testMain";
+            System.out.println("FXMLLoader");
+            FXMLLoader fxmlLoader = new FXMLLoader(MainImplementer.class.getResource(fxml+".fxml"));
+            System.out.println("FXMLLoader.load");
+            Parent root = fxmlLoader.load();
+            //Parent root=FXMLLoader.load(getClass().getResource("C:/Users/thebl/Java VSCode/JavaFX Exploration/test1artid/src/main/resources/com/testgroupid/primary.fxml"));
             System.out.println("Loaded!");
 
             }
             catch(Exception e){
                 e.printStackTrace();
-                System.out.println("Failed!");
+                System.out.println("Failed 1!");
                 //KEEP: (comment out when above works.)
                  //Group root = new Group(); //Note there are different root nodes, FUTURE.
             
             }
-        Group root = new Group(); //Note there are different root nodes, FUTURE.
+        
+           
+            
+            Group root = new Group(); //Note there are different root nodes, FUTURE.
             
             
 
