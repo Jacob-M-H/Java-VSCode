@@ -8,3 +8,9 @@ BroCode JavaFX:
 
 FXML Java, thenewboston.
     https://www.youtube.com/watch?v=K7BOH-Ll8_g
+
+JavaFX Text:
+    https://www.tutorialspoint.com/javafx/javafx_text.htm
+
+JavaFX List of Fonts:
+    https://motleybytes.com/w/JavaFxFonts
