@@ -152,7 +152,9 @@ public class MainImplementer extends Application{
     
     
     private static Parent loadFXML(String fxml) throws IOException {//From App.java Maven JavaFX sample project.
+        System.out.println("loadFXML class");
         FXMLLoader fxmlLoader = new FXMLLoader(MainImplementer.class.getResource(fxml + ".fxml"));
+        System.out.println("return fxmlLoader.load()");
         //Note if this was not a static, FXMLLoader.load(getClass().getResource(fxml+".fxml")); would work too. 
         return fxmlLoader.load();
     }
@@ -177,8 +179,8 @@ public class MainImplementer extends Application{
         String fxml = "testMain";
 
             try{ 
-             root=loadFXML(fxml);
-            
+                root=loadFXML(fxml);
+                System.out.println("Loaded!");
             }
             catch(Exception e){
                 e.printStackTrace();
@@ -186,7 +188,7 @@ public class MainImplementer extends Application{
                 //KEEP: (comment out when above works.)
                 //Group root = new Group(); //Note there are different root nodes, FUTURE. 
             }
-           
+            
              
             
             

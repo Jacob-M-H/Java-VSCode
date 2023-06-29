@@ -14,3 +14,6 @@ JavaFX Text:
 
 JavaFX List of Fonts:
     https://motleybytes.com/w/JavaFxFonts
+
+JavaFX Features - Java Junkie
+    https://www.youtube.com/c/javacodejunkie
