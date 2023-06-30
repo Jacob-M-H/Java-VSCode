@@ -17,3 +17,14 @@ JavaFX List of Fonts:
 
 JavaFX Features - Java Junkie
     https://www.youtube.com/c/javacodejunkie
+
+
+
+SubGoals:
+    General Window listeners, Menu items, and GUI layout.
+    Canvas resize, dragging and zooming relative size to the window.
+    Canvas above, without losing information.
+    Canvas above, while bliping items onto it, again, not losing information.
+    Canvas above, while being able to click and drag items.
+    Item functionality, and scalablility.
+    Other features from other 'drawing' programs. 
