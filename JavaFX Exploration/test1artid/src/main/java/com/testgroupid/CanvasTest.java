@@ -20,6 +20,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -38,18 +39,51 @@ public class CanvasTest extends Application{
     }
 
     //All caps are reserved for constants.
-    int defaultWidth=420;
-    int defaultHeight=420;
+    double defaultWidth=420;
+    double defaultHeight=420;
     boolean isResizable=true;
     String iconPath ="/Hilst Paint Icon.png";
     String stageTitle = "Canvas Goal 1";
     int windowSpawnX=0;
     int windowSpawnY=0;
     boolean isFullScreen = false; 
+    
+    //Scene defaults -convention, -1 means not set yet. 
+        //Scene Stage discrepency. If set to the same dimensions of the stage, it is 'larger' than the stage viewport. Figured out 14 pixels wider than the viewport, 38 taller than the viewport.
+        double sceneWidth; //The size of the stage takes priority, thus these values are less important to me.
+        double sceneHeight;
+        Color defaultSceneColor =Color.BLUE; 
+        final double initialSceneWidth=420;
+        final double initialSceneHeight=420;
+        //Note to be 'flush' with the bottom, assume there are ~2 pixels further on the Y/X axis, Likely consequense of hte Pixel Coordinate system detailedi n Node class.  
+        double decorW;
+        double decorH;
+    //Scrollable stuff
+        AnchorPane backBone=new AnchorPane();
+        AnchorPane innerPane = new AnchorPane(); 
+        ScrollBar moveInnerH=new ScrollBar();
+        ScrollBar moveInnerV =new ScrollBar(); 
+        //Inner and Backbone color stuff
+            BackgroundFill backBoneColor =
+                new BackgroundFill(
+                    Color.valueOf("#ff0fff"),
+                    new CornerRadii(0),
+                    new Insets(0)
+                    ); 
+            Background backBoneBackground =
+                new Background(backBoneColor); 
+            BackgroundFill innerPaneColor =  new BackgroundFill(
+                    Color.valueOf("#000000"),
+                    new CornerRadii(0),
+                    new Insets(0)
+                    ); 
+            Background innerPaneBackground =
+                new Background(innerPaneColor); 
+ 
 
     String stuff[] ={};
         
-    public Stage setDefaults(Stage stage){ 
+    public Stage setDefaultsStage(Stage stage){ 
         
         //Additional elements
         Image icon = new Image(iconPath); // the / means relative path. Found the item in Resources as desired.
@@ -62,12 +96,14 @@ public class CanvasTest extends Application{
         stage.setX(windowSpawnX);
         stage.setY(windowSpawnY);
         stage.setFullScreen(isFullScreen);
+        stage.setMinHeight(defaultHeight);
+        stage.setMinWidth(defaultWidth);
         //stage.setFullScreen(true);
         stage.setFullScreenExitHint("To Escape Fullscreen, press q");
         stage.setFullScreenExitKeyCombination(KeyCombination.valueOf("q"));
         return stage;
     }
-
+ 
 
     private void observer(Rectangle obs){
         String list="";
@@ -122,8 +158,47 @@ public class CanvasTest extends Application{
 
     }
 
- 
 
+        //I beleive the scene is resized with the stage. 
+    public void resizeComponentsX(){
+        System.out.println("Resize X wise componenets\n");
+    }
+    public void resizeComponentsY(){
+        System.out.println("Resize Y wise componenets\n");
+    } 
+
+
+    public void setScrollable(){ 
+        backBone.setVisible(true);
+        backBone.setCursor(Cursor.HAND);
+        innerPane.setVisible(true);
+        moveInnerV.setOrientation(Orientation.VERTICAL);
+        moveInnerH.setOrientation(Orientation.HORIZONTAL);
+        //Layout stuff
+            backBone.setLayoutX(0);
+            backBone.setLayoutY(0);
+            backBone.setPrefWidth(this.sceneWidth);
+            backBone.setPrefHeight(this.sceneHeight);
+        
+            moveInnerH.setLayoutX(10); 
+            moveInnerH.setLayoutY(sceneHeight-14.25);    
+            moveInnerH.setMaxWidth(sceneWidth-25);
+            moveInnerH.setMinWidth(sceneWidth-25);
+ 
+            moveInnerV.setLayoutX(sceneWidth-14.25); 
+            moveInnerV.setLayoutY(10);
+            moveInnerV.setMaxHeight(sceneHeight-25);
+            moveInnerV.setMinHeight(sceneHeight-25);
+              
+            innerPane.setMinWidth(50);
+            innerPane.setMinHeight(50);   
+    }
+
+    public void resizeScrollable(double X, double Y){ 
+        this.sceneHeight=this.sceneHeight+Y;
+        this.sceneWidth=this.sceneWidth+X;
+        setScrollable();
+    } 
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
     public void start(Stage stage) throws Exception{ //Stage primaryStage) { //throws Exception {
@@ -156,33 +231,34 @@ public class CanvasTest extends Application{
             //I shall keep Parent as the root, since it seems to have the subchildren of the major possible root nodes usually.
         */
 
- 
-        //Scene defaults
-            int sceneWidth = 420; //The size of the stage takes priority, thus these values are less important to me.
-            int sceneHeight = 420;
-            Color defaultSceneColor =Color.BLACK; 
+        
+         
+        Group root = new Group(); 
 
-        Group root = new Group();
-        AnchorPane backBone=new AnchorPane();
-        //root.getChildren().add(backBone); 
-        BackgroundFill backBoneColor =
-            new BackgroundFill(
-                Color.valueOf("#ff0fff"),
-                new CornerRadii(0),
-                new Insets(0)
-                ); 
-        Background backBoneBackground =
-            new Background(backBoneColor); 
-        Scene scene = new Scene(root, sceneWidth, 
-            sceneHeight, defaultSceneColor); //Scene requires at least 1 node, the root node. 
+        //Scene scene = new Scene(root, sceneWidth, 
+        //    sceneHeight, defaultSceneColor); //Scene requires at least 1 node, the root node.  
+         
+        Scene scene = new Scene(root, initialSceneWidth, 
+            initialSceneHeight, defaultSceneColor);
+        
+        //Set stage attributes
+        this.setDefaultsStage(stage); 
 
+        //Set and show the scene on the stage.
+        stage.setScene(scene);  
+        stage.show(); //This should be kept at the bottom of 'start' func. 
+        //All javafx applications use start() as strating point for construting javaFX application.
+        
+        //decoration discrepency.
+        this.decorW=initialSceneWidth-scene.getWidth();
+        this.decorH=initialSceneHeight-scene.getHeight(); 
+        this.sceneHeight=initialSceneHeight-this.decorH;
+        this.sceneWidth=initialSceneWidth-this.decorW;
 
-
-        backBone.setBackground(backBoneBackground);
-        backBone.setLayoutX(0);
-        backBone.setLayoutY(0);
-        backBone.setPrefWidth(scene.getWidth());
-        backBone.setPrefHeight(scene.getHeight());
+        this.setScrollable();
+        
+        backBone.setBackground(backBoneBackground); 
+        innerPane.setBackground(innerPaneBackground);  
         
         backBone.setOnMouseEntered(new EventHandler<Event>() { 
             @Override
@@ -196,54 +272,36 @@ public class CanvasTest extends Application{
                 System.out.println(event.getEventType());
             }
         });
-
-        AnchorPane innerPane = new AnchorPane();
-        backBone.getChildren().add(innerPane);
-        ScrollBar moveInnerH=new ScrollBar();
-        ScrollBar moveInnerV =new ScrollBar();
-        moveInnerV.setOrientation(Orientation.VERTICAL);
-        moveInnerH.setOrientation(Orientation.HORIZONTAL);
+ 
+         
         
         //int moveInnerHLeftBuffer=15; //int moveInnerHRightBuffer=20+moveInnerHLeftBuffer;  //int moveBarsOnScreen=50;
         //FUTURE: These are all eyeballed
-        moveInnerH.setLayoutX(10); 
-        moveInnerH.setLayoutY(sceneHeight-50);    
-        moveInnerH.setMaxWidth(sceneWidth-35);
-        moveInnerH.setMinWidth(sceneWidth-35);
-
-        moveInnerV.setLayoutX(sceneWidth-28);
-        moveInnerV.setLayoutY(10);
-        moveInnerV.setMaxHeight(sceneHeight-55);
-        moveInnerV.setMinHeight(sceneHeight-55);
-
-        root.getChildren().addAll(backBone,moveInnerH,moveInnerV); 
+         
+        //Tree stucture:
+        root.getChildren().addAll(backBone,moveInnerH,moveInnerV);  
+        backBone.getChildren().add(innerPane); 
         //Note, on stage resize, resize all of these, and scene sizes. 
         //Additionally, there seems to be a discrepency in the scene and stage size (though the values are the same).
         //FUTURE: Figure out the discrepency value. 
         
         
-        
-        backBone.setVisible(true);
-        backBone.setCursor(Cursor.HAND);
-        
-        //Set stage attributes
-        this.setDefaults(stage); 
-
-        //Set and show the scene on the stage.
-        stage.setScene(scene);
-        stage.show(); //This should be kept at the bottom of 'start' func. 
-        //All javafx applications use start() as strating point for construting javaFX application.
-        
+         
+        //this.resizeScrollableInnerPane();
 
 
         //FUTURE: Resize all elements appropraitely after screen size changes.
-        stage.widthProperty().addListener((obs, oldVal, newVal) -> {
-            // Do whatever you want
+        stage.widthProperty().addListener((obs, oldVal, newVal) -> { 
+            this.resizeComponentsX();
+            //System.out.println(newVal.doubleValue()-oldVal.doubleValue()); 
+            this.resizeScrollable(newVal.doubleValue()-oldVal.doubleValue(), 0);
+
             
         });
-
-        stage.heightProperty().addListener((obs, oldVal, newVal) -> {
-            // Do whatever you want
+        stage.heightProperty().addListener((obs, oldVal, newVal) -> { 
+            this.resizeComponentsY();
+            //System.out.println(newVal.doubleValue()-oldVal.doubleValue()); 
+            this.resizeScrollable(0,newVal.doubleValue()-oldVal.doubleValue());
         }); 
         
 
