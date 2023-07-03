@@ -2,6 +2,8 @@ package com.testgroupid;
  
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -11,6 +13,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 //import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 //import javafx.scene.canvas.Canvas;
 //import javafx.scene.control.Button;
@@ -73,7 +76,7 @@ public class CanvasTest extends Application{
             Background backBoneBackground =
                 new Background(backBoneColor); 
             BackgroundFill innerPaneColor =  new BackgroundFill(
-                    Color.valueOf("#000000"),
+                    Color.valueOf("#0EE3ED"),
                     new CornerRadii(0),
                     new Insets(0)
                     ); 
@@ -169,35 +172,35 @@ public class CanvasTest extends Application{
 
 
     public void setScrollable(){ 
-        backBone.setVisible(true);
-        backBone.setCursor(Cursor.HAND);
-        innerPane.setVisible(true);
-        moveInnerV.setOrientation(Orientation.VERTICAL);
-        moveInnerH.setOrientation(Orientation.HORIZONTAL);
+        this.backBone.setVisible(true);
+        this.backBone.setCursor(Cursor.HAND);
+        this.innerPane.setVisible(true);
+        this.moveInnerV.setOrientation(Orientation.VERTICAL);
+        this.moveInnerH.setOrientation(Orientation.HORIZONTAL);
         //Layout stuff
-            backBone.setLayoutX(0);
-            backBone.setLayoutY(0);
-            backBone.setPrefWidth(this.sceneWidth);
-            backBone.setPrefHeight(this.sceneHeight);
+            this.backBone.setLayoutX(0);
+            this.backBone.setLayoutY(0);
+            this.backBone.setPrefWidth(this.sceneWidth);
+            this.backBone.setPrefHeight(this.sceneHeight);
         
-            moveInnerH.setLayoutX(10); 
-            moveInnerH.setLayoutY(sceneHeight-14.25);    
-            moveInnerH.setMaxWidth(sceneWidth-25);
-            moveInnerH.setMinWidth(sceneWidth-25);
+            this.moveInnerH.setLayoutX(10); 
+            this.moveInnerH.setLayoutY(this.sceneHeight-14.25);    
+            this.moveInnerH.setMaxWidth(this.sceneWidth-25);
+            this.moveInnerH.setMinWidth(this.sceneWidth-25);
  
-            moveInnerV.setLayoutX(sceneWidth-14.25); 
-            moveInnerV.setLayoutY(10);
-            moveInnerV.setMaxHeight(sceneHeight-25);
-            moveInnerV.setMinHeight(sceneHeight-25);
+            this.moveInnerV.setLayoutX(this.sceneWidth-14.25); 
+            this.moveInnerV.setLayoutY(10);
+            this.moveInnerV.setMaxHeight(this.sceneHeight-25);
+            this.moveInnerV.setMinHeight(this.sceneHeight-25);
               
-            innerPane.setMinWidth(50);
-            innerPane.setMinHeight(50);   
+            this.innerPane.setMinWidth(50);
+            this.innerPane.setMinHeight(50); 
     }
 
     public void resizeScrollable(double X, double Y){ 
         this.sceneHeight=this.sceneHeight+Y;
         this.sceneWidth=this.sceneWidth+X;
-        setScrollable();
+        this.setScrollable();
     } 
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
@@ -246,8 +249,7 @@ public class CanvasTest extends Application{
 
         //Set and show the scene on the stage.
         stage.setScene(scene);  
-        stage.show(); //This should be kept at the bottom of 'start' func. 
-        //All javafx applications use start() as strating point for construting javaFX application.
+        stage.show();  //IF THIS IS MOVED, THINGS DON:T GO SUPER WELL. WHY?
         
         //decoration discrepency.
         this.decorW=initialSceneWidth-scene.getWidth();
@@ -258,37 +260,147 @@ public class CanvasTest extends Application{
         this.setScrollable();
         
         backBone.setBackground(backBoneBackground); 
-        innerPane.setBackground(innerPaneBackground);  
+        innerPane.setBackground(innerPaneBackground);    
+         
+        //Tree stucture:
+        root.getChildren().addAll(backBone,moveInnerH,moveInnerV);  
+        backBone.getChildren().add(innerPane);   
+         
+
+/* 
+    System.out.println(this.innerPane.getWidth());
+        System.out.println(innerPane.getWidth()); 
+        System.out.println(innerPane.getLayoutX());
+        System.out.println(innerPane.getLayoutY());
+
+        System.out.println(innerPane.getMaxHeight());
+        System.out.println(innerPane.getMaxWidth());
+        System.out.println(innerPane.widthProperty().doubleValue());
+        System.out.println(innerPane.heightProperty().doubleValue()); 
+        System.out.println(innerPane.boundsInLocalProperty()); 
+        System.out.println(innerPane.boundsInParentProperty());
+    */
+     
+        AnchorPane expandableZone = new AnchorPane(); 
+        backBone.getChildren().add(0, expandableZone); 
+        ScrollBar innerPaneScaleBar =new ScrollBar();
+        innerPaneScaleBar.setLayoutX(moveInnerH.getLayoutX());
+        innerPaneScaleBar.setLayoutY(moveInnerH.getLayoutY()-11);
+        root.getChildren().add(innerPaneScaleBar);
+         
+        //Work in progress. I don't like how I only set the min's, and I'm not sure what the trickle down
+            //effects of that choice is. Clean up later after scale investigation I think.
+        double innerPaneWidth=50;
+        double innerPaneHeight=50;
+        innerPane.setLayoutX((sceneWidth-innerPaneWidth)/2);
+        innerPane.setLayoutY((sceneHeight-innerPaneHeight)/2); 
+        //Expandable stuff
+            BackgroundFill expandableZoneColor =  new BackgroundFill(
+                    Color.valueOf("#4E4E4E"),
+                    new CornerRadii(0),
+                    new Insets(0)
+                    ); 
+            Background expandableZoneBackground =
+                new Background(expandableZoneColor); 
+        expandableZone.setBackground(expandableZoneBackground);
         
+        double expandableZoneWidth=innerPaneWidth+20;
+        double expandableZoneHeight=innerPaneHeight+20;
+        double eZbufferX=expandableZoneWidth-innerPaneWidth;
+        double eZbufferY=expandableZoneHeight-innerPaneHeight;
+        expandableZone.setMinWidth(expandableZoneWidth);
+        expandableZone.setMinHeight(expandableZoneHeight); 
+        expandableZone.setLayoutX(innerPane.getLayoutX()-(eZbufferX/2));
+        expandableZone.setLayoutY(innerPane.getLayoutY()-(eZbufferY/2));
+         
+        //Reports
+        Label iPWReport =new Label("iPW:"+String.valueOf(innerPaneWidth));
+        Label iPHReport =new Label("iPH:"+String.valueOf(innerPaneHeight));
+        Label iPSXReport =new Label("iPSX:"+String.valueOf(innerPane.getScaleX()));
+        Label iPSYReport =new Label("iPSY:"+String.valueOf(innerPane.getScaleY()));
+        AnchorPane Report=new AnchorPane();
+        root.getChildren().add(Report);
+        Report.getChildren().addAll(iPHReport, iPWReport,iPSXReport, iPSYReport);
+        iPWReport.setLayoutY(0);
+        iPHReport.setLayoutY(10);
+        iPSXReport.setLayoutY(20);
+        iPSYReport.setLayoutY(30);
+
+        //Center the scrollbars -off set in the listener, work required in scale after that test to properly set everything up. 
+        moveInnerH.setValue(50);
+        moveInnerV.setValue(50);
+        innerPaneScaleBar.setValue(100);
+
+         //Add listeners.
+        moveInnerH.valueProperty().addListener(new ChangeListener<Number>()  { 
+            @Override
+            public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                System.out.println("Current Value of moveInnerH: "+moveInnerH.getValue());
+                //System.out.println("DecipherH: "+arg0+" "+ arg1+" "+arg2);
+                innerPane.setLayoutX(innerPane.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
+                expandableZone.setLayoutX(expandableZone.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
+            } 
+            
+        });
+        moveInnerV.valueProperty().addListener(new ChangeListener<Number>()  { 
+            @Override
+            public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                System.out.println("Current Value of moveInnerV: "+moveInnerV.getValue());
+                //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
+                //Node class, double property, old val, new val
+                innerPane.setLayoutY(innerPane.getLayoutY()+(arg2.doubleValue()-arg1.doubleValue()));
+                expandableZone.setLayoutY(expandableZone.getLayoutY()+(arg2.doubleValue()-arg1.doubleValue()));
+            } 
+            
+        });
+        //this.resizeScrollableInnerPane();
+        innerPaneScaleBar.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                System.out.println("Current Value of ScaleBar: "+innerPaneScaleBar.getValue());
+                //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
+                //Node class, double property, old val, new val 
+                innerPane.setScaleX(innerPaneScaleBar.getValue()/100);
+                innerPane.setScaleY(innerPaneScaleBar.getValue()/100);
+                expandableZone.setScaleX(innerPaneScaleBar.getValue()/100);
+                expandableZone.setScaleY(innerPaneScaleBar.getValue()/100);
+                iPWReport.setText("iPW:"+String.valueOf(innerPaneWidth));
+                iPHReport.setText("iPH:"+String.valueOf(innerPaneHeight));
+                iPSXReport.setText("iPSX:"+String.valueOf(innerPane.getScaleX()));
+                iPSYReport.setText("iPSY:"+String.valueOf(innerPane.getScaleY()));
+            } 
+        });
+
+
+        innerPane.setOnMouseEntered(new EventHandler<Event>() { 
+            @Override
+            public void handle(Event event){
+                System.out.println("InnerPane " + event.getEventType());
+            }
+        });
+        innerPane.setOnMouseExited(new EventHandler<Event>() { 
+            @Override
+            public void handle(Event event){
+                System.out.println("InnerPane " + event.getEventType());
+            }
+        });
         backBone.setOnMouseEntered(new EventHandler<Event>() { 
             @Override
             public void handle(Event event){
-                System.out.println(event.getEventType());
+                System.out.println("backPane " +event.getEventType());
             }
         });
         backBone.setOnMouseExited(new EventHandler<Event>() { 
             @Override
             public void handle(Event event){
-                System.out.println(event.getEventType());
+                System.out.println("backPane "+event.getEventType());
             }
         });
  
-         
-        
-        //int moveInnerHLeftBuffer=15; //int moveInnerHRightBuffer=20+moveInnerHLeftBuffer;  //int moveBarsOnScreen=50;
-        //FUTURE: These are all eyeballed
-         
-        //Tree stucture:
-        root.getChildren().addAll(backBone,moveInnerH,moveInnerV);  
-        backBone.getChildren().add(innerPane); 
-        //Note, on stage resize, resize all of these, and scene sizes. 
-        //Additionally, there seems to be a discrepency in the scene and stage size (though the values are the same).
-        //FUTURE: Figure out the discrepency value. 
-        
-        
-         
-        //this.resizeScrollableInnerPane();
 
+
+
+//        innerPane.setScaleX(decorH);
 
         //FUTURE: Resize all elements appropraitely after screen size changes.
         stage.widthProperty().addListener((obs, oldVal, newVal) -> { 
