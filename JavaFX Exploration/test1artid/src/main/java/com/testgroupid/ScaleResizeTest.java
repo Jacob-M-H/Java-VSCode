@@ -25,6 +25,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -69,13 +70,17 @@ public class ScaleResizeTest extends Application{
         double decorH;
 
     //Inner Pane stuff
-      
-    double initialInnerPaneWidth=50;
-    double initialInnerPaneHeight=50;
-    double expandableZoneWidth=initialInnerPaneWidth+20;
-    double expandableZoneHeight=initialInnerPaneHeight+20;
-    double eZbufferX=expandableZoneWidth-initialInnerPaneWidth;
-    double eZbufferY=expandableZoneHeight-initialInnerPaneHeight;
+        double iPtoAnchorX=30;
+        double iPtoAnchorY=30;
+        double eZtoAnchorX=10;
+        double eZtoAnchorY=10;
+    double initialInnerPaneWidth=initialSceneWidth-iPtoAnchorX; //iP 30 pixels from window border initially, 
+    double initialInnerPaneHeight=initialSceneHeight-iPtoAnchorY;
+    double initialExpandableZoneWidth=initialSceneWidth-eZtoAnchorX; //eZ 10 pixels from window border initially,
+    double initialExpandableZoneHeight=initialSceneHeight-eZtoAnchorY;
+    //the constant distance between ip and ez, divided by 2 to get the total 'shadow' ip casts on ez.
+    double eZbufferX=initialExpandableZoneWidth-initialInnerPaneWidth;
+    double eZbufferY=initialExpandableZoneHeight-initialInnerPaneHeight;
 
 
     //Scrollable stuff
@@ -115,6 +120,9 @@ public class ScaleResizeTest extends Application{
                 new Background(expandableZoneColor); 
             //#endregion
     
+
+
+
     //Translucent Backgrond -ERROR, takes on color of parent, not true transparency. 
     BackgroundFill transFill =  new BackgroundFill(
                     Color.valueOf("#00FFFFFF"),
@@ -127,6 +135,16 @@ public class ScaleResizeTest extends Application{
 
     String stuff[] ={};
         
+
+    private double min(double eZScaleX, double eZScaleY) {
+        if (eZScaleX <= eZScaleY){
+            return eZScaleX;
+        }
+        else {
+            return eZScaleY;
+        }
+    } 
+
     public Stage setDefaultsStage(Stage stage){ 
         
         //Additional elements
@@ -167,11 +185,17 @@ public class ScaleResizeTest extends Application{
                         Label iPHReport =new Label("iPH:"+String.valueOf(initialInnerPaneHeight));
                         Label iPSXReport =new Label("iPSX:"+String.valueOf(innerPane.getScaleX()));
                         Label iPSYReport =new Label("iPSY:"+String.valueOf(innerPane.getScaleY()));  
-                        Report.getChildren().addAll(iPHReport, iPWReport,iPSXReport, iPSYReport);
+                        Label iPXLay =new Label("IPXLay:"+String.valueOf(innerPane.getLayoutX()));
+                        Label iPYLay =new Label("IPXLay:"+String.valueOf(innerPane.getLayoutY()));
+                        
+                        Report.getChildren().addAll(iPHReport, iPWReport,iPSXReport, iPSYReport, 
+                        iPXLay, iPYLay);
                         iPWReport.setLayoutY(0);
                         iPHReport.setLayoutY(10);
                         iPSXReport.setLayoutY(20);
                         iPSYReport.setLayoutY(30);
+                        iPXLay.setLayoutY(40);
+                        iPYLay.setLayoutY(50);
                         break;
                 
             }
@@ -182,7 +206,9 @@ public class ScaleResizeTest extends Application{
 
         //I beleive the scene is resized with the stage. 
     
-    
+    //BUG: Pref is not enough! Not sure why
+    //TODO: change these to bindings, though depending on the extent of the GUI, might be best to leave them as functions
+    //TODO: change the setting of width and height to be more succinct, min/max/prefDIM isn't what I want to keep. 
     public void resizeBackBoneX(double width){
             this.backBone.setPrefWidth(width);
         }
@@ -190,13 +216,26 @@ public class ScaleResizeTest extends Application{
             this.backBone.setPrefHeight(height);
         }
     public void resizeInnerPaneX(double width){
-            this.innerPane.setMinWidth(width);
+            this.innerPane.setMinWidth(width); 
+            this.innerPane.setMaxWidth(width);
+            this.innerPane.setPrefWidth(width); 
+            
         }
     public void resizeInnerPaneY(double height){
             this.innerPane.setMinHeight(height); 
+            this.innerPane.setMaxHeight(height); 
+            this.innerPane.setPrefHeight(height); 
         }
-    public void resizeExpandableZoneX(){}
-    public void resizeExpandableZoneY(){}
+    public void resizeExpandableZoneX(double width){
+            this.expandableZone.setMinWidth(width);
+            this.expandableZone.setMaxWidth(width);
+            this.expandableZone.setPrefWidth(width);
+        }
+    public void resizeExpandableZoneY(double height){
+            this.expandableZone.setMinHeight(height); 
+            this.expandableZone.setMaxHeight(height); 
+            this.expandableZone.setPrefHeight(height); 
+        }
     public void resizeMoveInnerH(double width, double yCord){ 
             this.moveInnerV.setPrefHeight(scrollbarThick);
             this.moveInnerV.setMinHeight(scrollbarThick); 
@@ -241,19 +280,23 @@ public class ScaleResizeTest extends Application{
             resizeInnerPaneY(initialInnerPaneHeight);
             innerPane.setLayoutX((refW-initialInnerPaneWidth)/2);
             innerPane.setLayoutY((refH-initialInnerPaneHeight)/2); 
-
+            System.out.println("iP PrefW: "+innerPane.getPrefWidth()
+            +" iP PrefH: "+innerPane.getPrefHeight());
+ 
+             
+            resizeExpandableZoneX(initialExpandableZoneWidth);
+            resizeExpandableZoneY(initialExpandableZoneHeight);
+            expandableZone.setLayoutX(innerPane.getLayoutX()-(eZbufferX/2));
+            expandableZone.setLayoutY(innerPane.getLayoutY()-(eZbufferY/2));
+ 
+            //Align zoombar with H-bar, may be moved later.
             zoomBar.setMaxHeight(scrollbarThick);
             zoomBar.setLayoutX(moveInnerH.getLayoutX());
             zoomBar.setLayoutY(moveInnerH.getLayoutY()-scrollbarThick+1);
-            
-            expandableZone.setMinWidth(expandableZoneWidth);
-            expandableZone.setMinHeight(expandableZoneHeight); 
-            expandableZone.setLayoutX(innerPane.getLayoutX()-(eZbufferX/2));
-            expandableZone.setLayoutY(innerPane.getLayoutY()-(eZbufferY/2));
-         
             //Center the scrollbars -off set in the listener, work required in scale after that test to properly set everything up. 
-            moveInnerH.setValue(50);
-            moveInnerV.setValue(50);
+            
+            //moveInnerH.setValue(0);
+            //moveInnerV.setValue(0);
             zoomBar.setValue(100);
 
 
@@ -280,7 +323,65 @@ public class ScaleResizeTest extends Application{
         this.decorH=initialSceneHeight-scene.getHeight(); 
         this.sceneHeight=initialSceneHeight-this.decorH;
         this.sceneWidth=initialSceneWidth-this.decorW;
-}
+    }
+
+    public double round(double rMe, double rBoundry){
+        //Asssert: rBoundry is positive.
+        boolean example =false;
+        if (example){
+        System.out.println(
+            "test 1: "+round(16.43,.25)+"\n"+
+            "test 2: "+round(-16.43,.25)+"\n"+
+            "test 3: "+round(16.43,-.25)+"\n"+
+            "test 4: "+round(-16.43,-.25)+"\n"+
+            "test 1: "+round(16.43,1.25)+"\n"+
+            "test 2: "+round(-16.43,1.25)+"\n"+
+            "test 3: "+round(16.43,-1.25)+"\n"+
+            "test 4: "+round(-16.43,-1.25)+"\n"
+        );}
+
+
+        if (rBoundry!=0){
+            double remainder;
+            double kept;
+            remainder = rMe%rBoundry;
+            kept=rMe-remainder;
+            double lowerB=0;
+            double upperB=0;
+            if (rBoundry<0){
+                rBoundry=Math.abs(rBoundry);
+            }
+            
+            if (rBoundry>0) { //Clean this later. unnecessarily complex. Simply take 1/2 of boundry and compare whether the remainder is less or greater than this value.
+                while(upperB<remainder){
+                    upperB+=rBoundry;
+                }
+                lowerB=upperB-rBoundry;
+            }
+            else {
+                while(lowerB>remainder){
+                    lowerB-=rBoundry;
+                }
+                upperB=lowerB+rBoundry;
+            }
+            if (Math.abs(Math.abs(upperB)-Math.abs(remainder))<Math.abs(Math.abs(lowerB)-Math.abs(remainder))){
+                //round up
+                kept+=upperB;
+            } else{
+                kept+=lowerB;
+            }
+            System.out.println("LB, UB:"+lowerB+" "+upperB+" Kept: "+kept+" remainder:"+remainder+"\n");
+
+            return kept;
+
+        } 
+        else if (rBoundry==0) {
+            return Math.round(rMe);//round up or down to nearest .0 value
+        } 
+        return Double.MAX_VALUE; //to signal bad
+    }
+    
+
     @Override //it gets upset at me if I don't have hte Stage stage argument
     public void start(Stage stage) throws Exception{ //Stage primaryStage) { //throws Exception {
 
@@ -304,7 +405,7 @@ public class ScaleResizeTest extends Application{
         //Tree stucture:
         root.getChildren().addAll(backBone);  
         backBone.getChildren().addAll(
-            expandableZone,innerPane, //panes
+            this.expandableZone,this.innerPane, //panes
             moveInnerH,moveInnerV,zoomBar //scrollbars
             );   
          
@@ -319,8 +420,55 @@ public class ScaleResizeTest extends Application{
         setReport(root, 0); 
  
          
-          
- 
+        resizeExpandableZoneX((initialExpandableZoneWidth+5)*2);//840
+        resizeExpandableZoneY((initialExpandableZoneHeight+5)*2);//840
+        resizeInnerPaneX((initialInnerPaneWidth+15)*2);//720
+        resizeInnerPaneY((initialInnerPaneHeight+15)*2);//720
+        //Protocol
+        if (expandableZone.getWidth()!=initialSceneWidth-eZtoAnchorX ||
+        expandableZone.getHeight()!=initialSceneHeight-eZtoAnchorY){ 
+            //UNTESTED : Will have to load file, or set eZ/iP to larger than sceneInitials.
+
+            //doesn't exaclty matter which. 
+            //Buffer needs ot be changed. what if we have a rectangular cnavas?
+            //figure out which is out of bounds, or the most extensivly out of bound.
+            //(scene-buffer)/currentDimEZ, doesn't factor in rectnagle. 
+            double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
+            double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
+            //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
+            double eZPriortyScale=min(eZScaleX,eZScaleY);
+            expandableZone.setScaleX(eZPriortyScale);
+            expandableZone.setScaleY(eZPriortyScale);
+
+            //Same for iP, a bit redundant though.
+            double iPScaleX=(initialSceneWidth-iPtoAnchorX)/innerPane.getMinWidth();
+            double iPScaleY=(initialSceneHeight-iPtoAnchorY)/innerPane.getMinHeight();
+            double iPPriorityScale=min(iPScaleX, iPScaleY);
+            innerPane.setScaleX(iPPriorityScale);
+            innerPane.setScaleY(iPPriorityScale);
+            System.out.println("Priority Scale:\neZ: "+eZPriortyScale+"\n iP: "+iPPriorityScale);
+            expandableZone.setLayoutX(eZtoAnchorX/2);
+            expandableZone.setLayoutY(eZtoAnchorY/2);
+            innerPane.setLayoutX(iPtoAnchorX/2);
+            innerPane.setLayoutY(iPtoAnchorY/2);
+        }
+
+            //Perhaps a view port needs to be made?
+                //backBone.setTopAnchor(innerPane, innerPane.getLayoutY());
+                //backBone.setLeftAnchor(innerPane, innerPane.getLayoutX());
+                //backBone.setTopAnchor(expandableZone, expandableZone.getLayoutY());
+                //backBone.setLeftAnchor(expandableZone, expandableZone.getLayoutX());
+        
+                
+        moveInnerH.setBlockIncrement(1);
+        moveInnerH.setBlockIncrement(1);
+        zoomBar.setBlockIncrement(1);
+        moveInnerH.setUnitIncrement(1);
+        moveInnerV.setUnitIncrement(1);
+        zoomBar.setUnitIncrement(1);
+
+         
+        
 
         //Add circles
         AnchorPane ULCircle =new AnchorPane();
@@ -372,9 +520,12 @@ public class ScaleResizeTest extends Application{
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
                 System.out.println("Current Value of moveInnerH: "+moveInnerH.getValue());
+                //moveInnerH=round(moveInnerH.getValue(),.05);
+
                 //System.out.println("DecipherH: "+arg0+" "+ arg1+" "+arg2);
                 innerPane.setLayoutX(innerPane.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
                 expandableZone.setLayoutX(expandableZone.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
+                setReport(root, 0);
             } 
             
         });
@@ -386,24 +537,35 @@ public class ScaleResizeTest extends Application{
                 //Node class, double property, old val, new val
                 innerPane.setLayoutY(innerPane.getLayoutY()+(arg2.doubleValue()-arg1.doubleValue()));
                 expandableZone.setLayoutY(expandableZone.getLayoutY()+(arg2.doubleValue()-arg1.doubleValue()));
+                setReport(root, 0);
             } 
             
         });
         //this.resizeScrollableInnerPane();
+        
+        
         zoomBar.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
                 System.out.println("Current Value of ScaleBar: "+zoomBar.getValue());
+                zoomBar.setValue(round(zoomBar.getValue(), .5));
+                System.out.println("Current Value of ScaleBar: "+zoomBar.getValue());
+
                 //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
                 //Node class, double property, old val, new val 
                 innerPane.setScaleX(zoomBar.getValue()/100);
                 innerPane.setScaleY(zoomBar.getValue()/100);
                 expandableZone.setScaleX(zoomBar.getValue()/100);
                 expandableZone.setScaleY(zoomBar.getValue()/100);
-                setReport(root, 0);
+                setReport(root, 0); 
+                //in addition to figuring it's new dimension, let us figure out a few things:
+                //viewport objects?
+                //DimScene - 1/2 new eZ Pane, (now we get the 'leftover' bits of backBone)
+                    // From this left over, divide by 2. Figure out based on the scale how much 'over' it's gone, and readjust the 
+                    //layout to negatives or positives as needed. 
             } 
         });
-
+        
 
         innerPane.setOnMouseEntered(new EventHandler<Event>() { 
             @Override
@@ -430,17 +592,15 @@ public class ScaleResizeTest extends Application{
             }
         });
  
-        
-//        innerPane.setScaleX(decorH);
+         
 
         //FUTURE: Resize all elements appropraitely after screen size changes.
         stage.widthProperty().addListener((obs, oldVal, newVal) -> { 
             //this.resizeComponentsX();
             //System.out.println(newVal.doubleValue()-oldVal.doubleValue()); 
-            this.resizeScrollable(newVal.doubleValue()-oldVal.doubleValue(), 0);
-
-            
+            this.resizeScrollable(newVal.doubleValue()-oldVal.doubleValue(), 0);  
         });
+
         stage.heightProperty().addListener((obs, oldVal, newVal) -> { 
             //this.resizeComponentsY();
             //System.out.println(newVal.doubleValue()-oldVal.doubleValue()); 
