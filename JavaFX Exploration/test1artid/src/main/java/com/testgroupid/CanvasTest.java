@@ -20,6 +20,7 @@ import javafx.scene.control.ScrollBar;
 //import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image; 
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -27,6 +28,8 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
   
@@ -82,6 +85,15 @@ public class CanvasTest extends Application{
                     ); 
             Background innerPaneBackground =
                 new Background(innerPaneColor); 
+
+    //Translucent Backgrond
+    BackgroundFill transFill =  new BackgroundFill(
+                    Color.valueOf("#00FFFFFF"),
+                    new CornerRadii(0),
+                    new Insets(0)
+                    ); 
+            Background transFillBackground =
+                new Background(transFill); 
  
 
     String stuff[] ={};
@@ -331,6 +343,51 @@ public class CanvasTest extends Application{
         moveInnerV.setValue(50);
         innerPaneScaleBar.setValue(100);
 
+        //Add circles
+        AnchorPane ULCircle =new AnchorPane();
+        ULCircle.setMaxHeight(10);
+        ULCircle.setMaxWidth(10);
+        ULCircle.setScaleX(1);
+        ULCircle.setScaleY(1);
+        Circle ULdot = new Circle();
+        ULdot.setCenterX(5);
+        ULdot.setCenterY(5);
+        ULdot.setRadius(5);
+        ULdot.setFill(Paint.valueOf("blue")); 
+        ULCircle.setOpacity(0);
+        ULCircle.getChildren().add(ULdot);
+        AnchorPane.setTopAnchor(ULCircle, -5.0);
+        AnchorPane.setLeftAnchor(ULCircle, -5.0);
+        innerPane.getChildren().add(ULCircle);
+        ULCircle.setOpacity(0);
+        ULCircle.setOnMouseEntered(new EventHandler<Event>() {
+            public void handle(Event event){
+                System.out.println("In ULCircle"); 
+                ULCircle.setOpacity(1);
+            }
+        });
+        ULCircle.setOnMouseExited(new EventHandler<Event>() {
+            public void handle(Event event){
+                System.out.println("Out ULCircle");
+                ULCircle.setOpacity(0);
+            }
+        }); 
+        
+         innerPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event){
+                innerPane.setMaxHeight(innerPane.getMinHeight());
+                innerPane.setMaxWidth(innerPane.getMinWidth());
+                System.out.println("Max W, H " + innerPane.getMaxWidth()+" "+innerPane.getMaxWidth());
+                System.out.println("getX "+event.getX()+" getY "+ event.getY()); //in object
+               // System.out.println("getSceneX "+event.getSceneX()+" getSceneY "+ event.getSceneY()); //in scene
+               // System.out.println("getScreenX "+event.getScreenX()+" getScreenY "+ event.getScreenY()); //in stage
+                Rectangle tempRect = new Rectangle( event.getX(), event.getY(),10, 10); //cords, dim
+                innerPane.getChildren().add(tempRect);
+            
+            }
+        });
+        
+
          //Add listeners.
         moveInnerH.valueProperty().addListener(new ChangeListener<Number>()  { 
             @Override
@@ -397,9 +454,7 @@ public class CanvasTest extends Application{
             }
         });
  
-
-
-
+        
 //        innerPane.setScaleX(decorH);
 
         //FUTURE: Resize all elements appropraitely after screen size changes.
@@ -416,6 +471,8 @@ public class CanvasTest extends Application{
             this.resizeScrollable(0,newVal.doubleValue()-oldVal.doubleValue());
         }); 
         
+
+
 
 
     }

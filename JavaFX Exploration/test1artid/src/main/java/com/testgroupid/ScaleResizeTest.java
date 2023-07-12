@@ -46,6 +46,7 @@ public class ScaleResizeTest extends Application{
         launch(args); //from Application Parent, sends string to launch method, then start method automatically called.
     }
 
+    //#region
     //All caps are reserved for constants.
     double defaultWidth=420;
     double defaultHeight=420;
@@ -134,7 +135,7 @@ public class ScaleResizeTest extends Application{
  
 
     String stuff[] ={};
-        
+    //#endregion
 
     private double min(double eZScaleX, double eZScaleY) {
         if (eZScaleX <= eZScaleY){
@@ -144,7 +145,62 @@ public class ScaleResizeTest extends Application{
             return eZScaleY;
         }
     } 
+    public double round(double rMe, double rBoundry){
+            //Asssert: rBoundry is positive.
+            boolean example =false;
+            if (example){
+            System.out.println(
+                "test 1: "+round(16.43,.25)+"\n"+
+                "test 2: "+round(-16.43,.25)+"\n"+
+                "test 3: "+round(16.43,-.25)+"\n"+
+                "test 4: "+round(-16.43,-.25)+"\n"+
+                "test 1: "+round(16.43,1.25)+"\n"+
+                "test 2: "+round(-16.43,1.25)+"\n"+
+                "test 3: "+round(16.43,-1.25)+"\n"+
+                "test 4: "+round(-16.43,-1.25)+"\n"
+            );}
 
+
+            if (rBoundry!=0){
+                double remainder;
+                double kept;
+                remainder = rMe%rBoundry;
+                kept=rMe-remainder;
+                double lowerB=0;
+                double upperB=0;
+                if (rBoundry<0){
+                    rBoundry=Math.abs(rBoundry);
+                }
+                
+                if (rBoundry>0) { //Clean this later. unnecessarily complex. Simply take 1/2 of boundry and compare whether the remainder is less or greater than this value.
+                    while(upperB<remainder){
+                        upperB+=rBoundry;
+                    }
+                    lowerB=upperB-rBoundry;
+                }
+                else {
+                    while(lowerB>remainder){
+                        lowerB-=rBoundry;
+                    }
+                    upperB=lowerB+rBoundry;
+                }
+                if (Math.abs(Math.abs(upperB)-Math.abs(remainder))<Math.abs(Math.abs(lowerB)-Math.abs(remainder))){
+                    //round up
+                    kept+=upperB;
+                } else{
+                    kept+=lowerB;
+                }
+                System.out.println("LB, UB:"+lowerB+" "+upperB+" Kept: "+kept+" remainder:"+remainder+"\n");
+
+                return kept;
+
+            } 
+            else if (rBoundry==0) {
+                return Math.round(rMe);//round up or down to nearest .0 value
+            } 
+            return Double.MAX_VALUE; //to signal bad
+        }
+        
     public Stage setDefaultsStage(Stage stage){ 
         
         //Additional elements
@@ -174,6 +230,9 @@ public class ScaleResizeTest extends Application{
     public void setReport(Group container, int lever){
         //version that takes in account container size, a number over levers, and 
         //a running value for moving the text around, would be nice. 
+        Label collection[];
+        int start = 0; 
+        
         try{
             removeReport(container);
         }
@@ -181,24 +240,51 @@ public class ScaleResizeTest extends Application{
             System.out.println("Try lever: "+ lever);
             switch(lever){
                 case 0: 
-                        Label iPWReport =new Label("iPW:"+String.valueOf(initialInnerPaneWidth));
-                        Label iPHReport =new Label("iPH:"+String.valueOf(initialInnerPaneHeight));
+                        Label iPWReport =new Label("iPW:"+String.valueOf(innerPane.getMinWidth()));
+                        Label iPHReport =new Label("iPH:"+String.valueOf(innerPane.getMinHeight()));
                         Label iPSXReport =new Label("iPSX:"+String.valueOf(innerPane.getScaleX()));
                         Label iPSYReport =new Label("iPSY:"+String.valueOf(innerPane.getScaleY()));  
                         Label iPXLay =new Label("IPXLay:"+String.valueOf(innerPane.getLayoutX()));
-                        Label iPYLay =new Label("IPXLay:"+String.valueOf(innerPane.getLayoutY()));
+                        Label iPYLay =new Label("IPYLay:"+String.valueOf(innerPane.getLayoutY()));
+                         
+                        collection = new Label[] {iPHReport, iPWReport,iPSXReport, iPSYReport, 
+                        iPXLay, iPYLay};
+
+                        for (Label x : collection){
+                            Report.getChildren().add(x);
+                            x.setTextFill(Paint.valueOf("Orange"));
+                            x.setLayoutY(start);
+                            start+=10;
+                            } 
+                        break;
+                    
+                case 1: 
+                        Label eZWReport =new Label("eZW:"+String.valueOf(expandableZone.getMinWidth()));
+                        Label eZHReport =new Label("eZH:"+String.valueOf(expandableZone.getMinHeight()));
+                        Label eZSXReport =new Label("eZSX:"+String.valueOf(expandableZone.getScaleX()));
+                        Label eZSYReport =new Label("eZSY:"+String.valueOf(expandableZone.getScaleY()));  
+                        Label eZXLay =new Label("eZXLay:"+String.valueOf(expandableZone.getLayoutX()));
+                        Label eZYLay =new Label("eZYLay:"+String.valueOf(expandableZone.getLayoutY()));
+                
+                        double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth());
+                        double ActualEZX = (initialSceneWidth - ActualEZW)/2;  //420-840/2=-210?
+                        Label eZActualW=new Label("eZAW: "+String.valueOf(ActualEZW));
+                        Label eZActualX=new Label("eZAX: "+String.valueOf(ActualEZX));
+                         
                         
-                        Report.getChildren().addAll(iPHReport, iPWReport,iPSXReport, iPSYReport, 
-                        iPXLay, iPYLay);
-                        iPWReport.setLayoutY(0);
-                        iPHReport.setLayoutY(10);
-                        iPSXReport.setLayoutY(20);
-                        iPSYReport.setLayoutY(30);
-                        iPXLay.setLayoutY(40);
-                        iPYLay.setLayoutY(50);
+                        collection = new Label[] {eZHReport, eZWReport,eZSXReport, eZSYReport, 
+                        eZXLay, eZYLay,
+                        eZActualW, eZActualX};
+
+                        for (Label x : collection){
+                            Report.getChildren().add(x);
+                            x.setTextFill(Paint.valueOf("Orange"));
+                            x.setLayoutY(start);
+                            start+=10;
+                            } 
                         break;
                 
-            }
+            } 
 
             container.getChildren().add(Report);
         }
@@ -325,66 +411,17 @@ public class ScaleResizeTest extends Application{
         this.sceneWidth=initialSceneWidth-this.decorW;
     }
 
-    public double round(double rMe, double rBoundry){
-        //Asssert: rBoundry is positive.
-        boolean example =false;
-        if (example){
-        System.out.println(
-            "test 1: "+round(16.43,.25)+"\n"+
-            "test 2: "+round(-16.43,.25)+"\n"+
-            "test 3: "+round(16.43,-.25)+"\n"+
-            "test 4: "+round(-16.43,-.25)+"\n"+
-            "test 1: "+round(16.43,1.25)+"\n"+
-            "test 2: "+round(-16.43,1.25)+"\n"+
-            "test 3: "+round(16.43,-1.25)+"\n"+
-            "test 4: "+round(-16.43,-1.25)+"\n"
-        );}
-
-
-        if (rBoundry!=0){
-            double remainder;
-            double kept;
-            remainder = rMe%rBoundry;
-            kept=rMe-remainder;
-            double lowerB=0;
-            double upperB=0;
-            if (rBoundry<0){
-                rBoundry=Math.abs(rBoundry);
-            }
-            
-            if (rBoundry>0) { //Clean this later. unnecessarily complex. Simply take 1/2 of boundry and compare whether the remainder is less or greater than this value.
-                while(upperB<remainder){
-                    upperB+=rBoundry;
-                }
-                lowerB=upperB-rBoundry;
-            }
-            else {
-                while(lowerB>remainder){
-                    lowerB-=rBoundry;
-                }
-                upperB=lowerB+rBoundry;
-            }
-            if (Math.abs(Math.abs(upperB)-Math.abs(remainder))<Math.abs(Math.abs(lowerB)-Math.abs(remainder))){
-                //round up
-                kept+=upperB;
-            } else{
-                kept+=lowerB;
-            }
-            System.out.println("LB, UB:"+lowerB+" "+upperB+" Kept: "+kept+" remainder:"+remainder+"\n");
-
-            return kept;
-
-        } 
-        else if (rBoundry==0) {
-            return Math.round(rMe);//round up or down to nearest .0 value
-        } 
-        return Double.MAX_VALUE; //to signal bad
-    }
     
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
     public void start(Stage stage) throws Exception{ //Stage primaryStage) { //throws Exception {
-
+        
+        moveInnerH.setBlockIncrement(1);
+        moveInnerH.setBlockIncrement(1);
+        zoomBar.setBlockIncrement(1);
+        moveInnerH.setUnitIncrement(1);
+        moveInnerV.setUnitIncrement(1);
+        zoomBar.setUnitIncrement(1);
         ScaleResizeTest.selfInfo(); 
         Group root = new Group();  
         Scene scene = new Scene(root, initialSceneWidth, 
@@ -417,40 +454,42 @@ public class ScaleResizeTest extends Application{
          
          
         //Reports - new container option that will hold labels for experimentation. 
-        setReport(root, 0); 
+        setReport(root, 1); 
  
-         
-        resizeExpandableZoneX((initialExpandableZoneWidth+5)*2);//840
-        resizeExpandableZoneY((initialExpandableZoneHeight+5)*2);//840
-        resizeInnerPaneX((initialInnerPaneWidth+15)*2);//720
-        resizeInnerPaneY((initialInnerPaneHeight+15)*2);//720
+          
+        resizeExpandableZoneX((initialExpandableZoneWidth+10)*2);//840
+        resizeExpandableZoneY((initialExpandableZoneHeight+10)*2);//840
+        resizeInnerPaneX((initialInnerPaneWidth+30)*2);//720
+        resizeInnerPaneY((initialInnerPaneHeight+30)*2);//720
         //Protocol
-        if (expandableZone.getWidth()!=initialSceneWidth-eZtoAnchorX ||
-        expandableZone.getHeight()!=initialSceneHeight-eZtoAnchorY){ 
+        if (expandableZone.getWidth()!=initialSceneWidth ||
+        expandableZone.getHeight()!=initialSceneHeight){ 
             //UNTESTED : Will have to load file, or set eZ/iP to larger than sceneInitials.
 
             //doesn't exaclty matter which. 
             //Buffer needs ot be changed. what if we have a rectangular cnavas?
             //figure out which is out of bounds, or the most extensivly out of bound.
             //(scene-buffer)/currentDimEZ, doesn't factor in rectnagle. 
-            double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
-            double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
+            double eZScaleX=(initialSceneWidth)/expandableZone.getMinWidth();
+            double eZScaleY=(initialSceneHeight)/expandableZone.getMinHeight();
             //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
             double eZPriortyScale=min(eZScaleX,eZScaleY);
             expandableZone.setScaleX(eZPriortyScale);
             expandableZone.setScaleY(eZPriortyScale);
+ 
+
 
             //Same for iP, a bit redundant though.
-            double iPScaleX=(initialSceneWidth-iPtoAnchorX)/innerPane.getMinWidth();
-            double iPScaleY=(initialSceneHeight-iPtoAnchorY)/innerPane.getMinHeight();
+            double iPScaleX=(initialSceneWidth)/innerPane.getMinWidth();
+            double iPScaleY=(initialSceneHeight)/innerPane.getMinHeight();
             double iPPriorityScale=min(iPScaleX, iPScaleY);
             innerPane.setScaleX(iPPriorityScale);
             innerPane.setScaleY(iPPriorityScale);
             System.out.println("Priority Scale:\neZ: "+eZPriortyScale+"\n iP: "+iPPriorityScale);
-            expandableZone.setLayoutX(eZtoAnchorX/2);
-            expandableZone.setLayoutY(eZtoAnchorY/2);
-            innerPane.setLayoutX(iPtoAnchorX/2);
-            innerPane.setLayoutY(iPtoAnchorY/2);
+            expandableZone.setLayoutX(0);
+            expandableZone.setLayoutY(0);
+            innerPane.setLayoutX(15);
+            innerPane.setLayoutY(15);
         }
 
             //Perhaps a view port needs to be made?
@@ -458,19 +497,18 @@ public class ScaleResizeTest extends Application{
                 //backBone.setLeftAnchor(innerPane, innerPane.getLayoutX());
                 //backBone.setTopAnchor(expandableZone, expandableZone.getLayoutY());
                 //backBone.setLeftAnchor(expandableZone, expandableZone.getLayoutX());
-        
-                
-        moveInnerH.setBlockIncrement(1);
-        moveInnerH.setBlockIncrement(1);
-        zoomBar.setBlockIncrement(1);
-        moveInnerH.setUnitIncrement(1);
-        moveInnerV.setUnitIncrement(1);
-        zoomBar.setUnitIncrement(1);
-
+         /**/
          
         
+        double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth());
+        double ActualEZX = (initialSceneWidth - ActualEZW)/2;  
+        //Assume equal pull from zooms.
+        expandableZone.setLayoutX(.5*ActualEZW*(-1));//move left by half of your zoom.
+        //This worked, sorta?
 
+        setReport(root, 1); 
         //Add circles
+        //#region
         AnchorPane ULCircle =new AnchorPane();
         ULCircle.setMaxHeight(10);
         ULCircle.setMaxWidth(10);
@@ -499,7 +537,8 @@ public class ScaleResizeTest extends Application{
                 ULCircle.setOpacity(0);
             }
         }); 
-        
+        //#endregion
+
          innerPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event){
                 innerPane.setMaxHeight(innerPane.getMinHeight());
@@ -519,25 +558,27 @@ public class ScaleResizeTest extends Application{
         moveInnerH.valueProperty().addListener(new ChangeListener<Number>()  { 
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                moveInnerH.setValue(round(moveInnerH.getValue(), 1));
                 System.out.println("Current Value of moveInnerH: "+moveInnerH.getValue());
                 //moveInnerH=round(moveInnerH.getValue(),.05);
 
                 //System.out.println("DecipherH: "+arg0+" "+ arg1+" "+arg2);
                 innerPane.setLayoutX(innerPane.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
                 expandableZone.setLayoutX(expandableZone.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
-                setReport(root, 0);
+                setReport(root, 1);
             } 
             
         });
         moveInnerV.valueProperty().addListener(new ChangeListener<Number>()  { 
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                moveInnerV.setValue(round(moveInnerV.getValue(), 1));
                 System.out.println("Current Value of moveInnerV: "+moveInnerV.getValue());
                 //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
                 //Node class, double property, old val, new val
                 innerPane.setLayoutY(innerPane.getLayoutY()+(arg2.doubleValue()-arg1.doubleValue()));
                 expandableZone.setLayoutY(expandableZone.getLayoutY()+(arg2.doubleValue()-arg1.doubleValue()));
-                setReport(root, 0);
+                setReport(root, 1);
             } 
             
         });
@@ -547,7 +588,6 @@ public class ScaleResizeTest extends Application{
         zoomBar.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                System.out.println("Current Value of ScaleBar: "+zoomBar.getValue());
                 zoomBar.setValue(round(zoomBar.getValue(), .5));
                 System.out.println("Current Value of ScaleBar: "+zoomBar.getValue());
 
@@ -557,12 +597,14 @@ public class ScaleResizeTest extends Application{
                 innerPane.setScaleY(zoomBar.getValue()/100);
                 expandableZone.setScaleX(zoomBar.getValue()/100);
                 expandableZone.setScaleY(zoomBar.getValue()/100);
-                setReport(root, 0); 
+                setReport(root, 1); 
                 //in addition to figuring it's new dimension, let us figure out a few things:
                 //viewport objects?
                 //DimScene - 1/2 new eZ Pane, (now we get the 'leftover' bits of backBone)
                     // From this left over, divide by 2. Figure out based on the scale how much 'over' it's gone, and readjust the 
                     //layout to negatives or positives as needed. 
+ 
+            
             } 
         });
         

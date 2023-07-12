@@ -1,0 +1,15 @@
+1.Is there a scalable pane? A property that would help me.
+2. Buttons - drag/swap, click to cycle, click to add layer, add scroll bar. Make transparent all layers to the right, 
+    group layers (make a smaller button that contains the others, animate to respread them)
+3. Scroll pane inside another pane (H/V bars), drag if possible?
+4. Get mouse position
+4.5. Give translation of mouse position to the zoom/scale, and return. 
+5. Give every shape a 'order', such as front or back.
+
+6. More UI -shapes, menu bar, bring together stuff.
+
+
+last. Back end, organize shapes, make selecting of lines and points possible. Perhaps make all 'shapes' point based?
+Dispatch events, what if we have two hoverable shapes? How can I make each pixel a 'hoverable' entitiy? I don't want a ton of objects either...
+4-tertierary tree for spliting screen objects on spawn? Each node independnelty added to the tree?
+Drawing to a specific pane and track back end might be best bet tbh. 
