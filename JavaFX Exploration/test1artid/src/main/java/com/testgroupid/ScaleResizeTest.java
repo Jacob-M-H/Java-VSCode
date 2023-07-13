@@ -459,11 +459,14 @@ public class ScaleResizeTest extends Application{
 
 
         //Resize the zones. Should be compatible with any number of positive values.  
-        resizeExpandableZoneX((initialExpandableZoneWidth)*2);//820
-        resizeExpandableZoneY((initialExpandableZoneHeight)*2);//820  
+        //resizeExpandableZoneX((initialExpandableZoneWidth)*2);//820
+        //resizeExpandableZoneY((initialExpandableZoneHeight)*2);//820  
 
-        //resizeExpandableZoneX((initialExpandableZoneWidth));//420
-        //resizeExpandableZoneY((initialExpandableZoneHeight));//420 
+        //resizeExpandableZoneX((initialExpandableZoneWidth));//410
+        //resizeExpandableZoneY((initialExpandableZoneHeight));//410
+
+        resizeExpandableZoneX((initialExpandableZoneWidth/2));//205
+        resizeExpandableZoneY((initialExpandableZoneHeight/2));//205
         innerPane.setVisible(false);
         //Protocol
         if (expandableZone.getWidth()!=initialSceneWidth ||
@@ -471,17 +474,24 @@ public class ScaleResizeTest extends Application{
         //BUG: getWidht, Height return 0's. 
 
             if (expandableZone.getMinWidth()<=initialSceneWidth && expandableZone.getMinHeight() <=initialSceneHeight) {
-                //don't scale up. Keep as it is, but center on screen.
-                expandableZone.setScaleX(1);
-                expandableZone.setScaleY(1);
-                innerPane.setScaleX(1);
-                innerPane.setScaleY(1);
+                //First figure out scale
+                    double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
+                    double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
+                    //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
+                    double eZPriortyScale=Math.min(eZScaleX,eZScaleY);
+                    expandableZone.setScaleX(eZPriortyScale);
+                    expandableZone.setScaleY(eZPriortyScale); 
                 //account for buffer, then get difference from 'ideal' square of ScreenDim-buffer, and the actual shape.
-                double disty =-initialSceneHeight+eZtoAnchorY+expandableZone.getMinHeight();
-                double distx =-initialSceneWidth+eZtoAnchorX+expandableZone.getMinWidth();  
-                expandableZone.setLayoutY((disty+eZtoAnchorY)/2);
-                expandableZone.setLayoutX((distx+eZtoAnchorX)/2);
-                //System.out.println(distx+" "+eZtoAnchorX + " "+initialSceneWidth +" "+ expandableZone.getMinWidth());
+                    //TEST: for smaller than 410, might need actualW actualH getMinW getMinH etc. like below. In that case same algorithm except for finding priority scale. 
+                
+            //Now figure actual width and height based on scale:
+                double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth()); 
+                double ActualEZH=(expandableZone.getScaleY()*expandableZone.getMinHeight()); 
+                double ActualEZY =initialSceneHeight-eZtoAnchorY-expandableZone.getMinHeight(); //Different from if it was larger than the screen!
+                double ActualEZX =initialSceneWidth-eZtoAnchorX-expandableZone.getMinWidth();  
+                expandableZone.setLayoutY((ActualEZY+eZtoAnchorY)/2);
+                expandableZone.setLayoutX((ActualEZX+eZtoAnchorX)/2);
+                System.out.println(ActualEZX+" "+eZtoAnchorX + " "+initialSceneWidth +" "+ expandableZone.getMinWidth());
                 //S.w=10+2*?+actualwidth, so 
                 //2*? =10+actualWidth -S.2
                 
@@ -491,7 +501,7 @@ public class ScaleResizeTest extends Application{
             double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
             double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
             //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
-            double eZPriortyScale=min(eZScaleX,eZScaleY);
+            double eZPriortyScale=Math.min(eZScaleX,eZScaleY);
             expandableZone.setScaleX(eZPriortyScale);
             expandableZone.setScaleY(eZPriortyScale); 
             //Now figure actual width and height based on scale:
@@ -505,12 +515,10 @@ public class ScaleResizeTest extends Application{
             //Assume equal pull from zooms.
             
             //ActualX, Y are treated sort of like the zoom if it was smaller than the frame. These are like 'counter buffers' eZtoAnchor.
-            //ActualW, H are treated sort of like the getwidth hegiht if it was smaller than the frame.
-            double disty =-initialSceneHeight+eZtoAnchorY+ActualEZH;
-            double distx =-initialSceneWidth+eZtoAnchorX+ActualEZW;  
-            expandableZone.setLayoutY((disty+eZtoAnchorY)/2 -ActualEZY);
-            expandableZone.setLayoutX((distx+eZtoAnchorX)/2 -ActualEZX);
-            System.out.println(distx+" "+eZtoAnchorX + " "+initialSceneWidth +" "+ ActualEZW);
+            //ActualW, H are treated sort of like the getwidth hegiht if it was smaller than the frame. 
+            expandableZone.setLayoutY((eZtoAnchorY)/2 -ActualEZY);
+            expandableZone.setLayoutX((eZtoAnchorX)/2 -ActualEZX);
+            System.out.println(" "+eZtoAnchorX + " "+initialSceneWidth +" "+ ActualEZW);
             System.out.println(" "+ActualEZX+ " ");
                 //ActualEZ[Cord] is how far 'forward' the value is from where it needs to be. thus everything else I think follows.
             // 
