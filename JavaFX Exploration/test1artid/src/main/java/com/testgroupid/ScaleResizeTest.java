@@ -450,61 +450,100 @@ public class ScaleResizeTest extends Application{
         
           
          
-          
+          //For now we'll just get dimension stuff set up using Ez like planned. then repeat for iP. 
          
          
         //Reports - new container option that will hold labels for experimentation. 
         setReport(root, 1); 
  
-          
-        resizeExpandableZoneX((initialExpandableZoneWidth+10)*2);//840
-        resizeExpandableZoneY((initialExpandableZoneHeight+10)*2);//840
-        resizeInnerPaneX((initialInnerPaneWidth+30)*2);//720
-        resizeInnerPaneY((initialInnerPaneHeight+30)*2);//720
+
+
+        //Resize the zones. Should be compatible with any number of positive values.  
+        resizeExpandableZoneX((initialExpandableZoneWidth)*2);//820
+        resizeExpandableZoneY((initialExpandableZoneHeight)*2);//820  
+
+        //resizeExpandableZoneX((initialExpandableZoneWidth));//420
+        //resizeExpandableZoneY((initialExpandableZoneHeight));//420 
+        innerPane.setVisible(false);
         //Protocol
         if (expandableZone.getWidth()!=initialSceneWidth ||
-        expandableZone.getHeight()!=initialSceneHeight){ 
-            //UNTESTED : Will have to load file, or set eZ/iP to larger than sceneInitials.
+        expandableZone.getHeight()!=initialSceneHeight){ //let's run this first one always to get initials regardless of dimensions. later we should check though properly.
+        //BUG: getWidht, Height return 0's. 
 
-            //doesn't exaclty matter which. 
-            //Buffer needs ot be changed. what if we have a rectangular cnavas?
-            //figure out which is out of bounds, or the most extensivly out of bound.
-            //(scene-buffer)/currentDimEZ, doesn't factor in rectnagle. 
-            double eZScaleX=(initialSceneWidth)/expandableZone.getMinWidth();
-            double eZScaleY=(initialSceneHeight)/expandableZone.getMinHeight();
+            if (expandableZone.getMinWidth()<=initialSceneWidth && expandableZone.getMinHeight() <=initialSceneHeight) {
+                //don't scale up. Keep as it is, but center on screen.
+                expandableZone.setScaleX(1);
+                expandableZone.setScaleY(1);
+                innerPane.setScaleX(1);
+                innerPane.setScaleY(1);
+                //account for buffer, then get difference from 'ideal' square of ScreenDim-buffer, and the actual shape.
+                double disty =-initialSceneHeight+eZtoAnchorY+expandableZone.getMinHeight();
+                double distx =-initialSceneWidth+eZtoAnchorX+expandableZone.getMinWidth();  
+                expandableZone.setLayoutY((disty+eZtoAnchorY)/2);
+                expandableZone.setLayoutX((distx+eZtoAnchorX)/2);
+                //System.out.println(distx+" "+eZtoAnchorX + " "+initialSceneWidth +" "+ expandableZone.getMinWidth());
+                //S.w=10+2*?+actualwidth, so 
+                //2*? =10+actualWidth -S.2
+                
+            }
+            else {
+            //First figure out scale
+            double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
+            double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
             //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
             double eZPriortyScale=min(eZScaleX,eZScaleY);
             expandableZone.setScaleX(eZPriortyScale);
-            expandableZone.setScaleY(eZPriortyScale);
+            expandableZone.setScaleY(eZPriortyScale); 
+            //Now figure actual width and height based on scale:
+            double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth()); 
+            double ActualEZH=(expandableZone.getScaleY()*expandableZone.getMinHeight()); 
+            double ActualEZX=(expandableZone.getMinWidth()-ActualEZW)/2; //The space taken up discrpency, 'excess' space left by the zoom out, or receeded space.
+            double ActualEZY=(expandableZone.getMinHeight()-ActualEZH)/2; //The space taken up discrpency, 'excess' space left by the zoom out, or receeded space.
+            //Original size of eZ, minus 
+            //recessed space =840-420 (getMinW, minus actual displayed Wid), 
+            //Divide by 2 to get how far left we should go, our new 'default' layout X? 
+            //Assume equal pull from zooms.
+            
+            //ActualX, Y are treated sort of like the zoom if it was smaller than the frame. These are like 'counter buffers' eZtoAnchor.
+            //ActualW, H are treated sort of like the getwidth hegiht if it was smaller than the frame.
+            double disty =-initialSceneHeight+eZtoAnchorY+ActualEZH;
+            double distx =-initialSceneWidth+eZtoAnchorX+ActualEZW;  
+            expandableZone.setLayoutY((disty+eZtoAnchorY)/2 -ActualEZY);
+            expandableZone.setLayoutX((distx+eZtoAnchorX)/2 -ActualEZX);
+            System.out.println(distx+" "+eZtoAnchorX + " "+initialSceneWidth +" "+ ActualEZW);
+            System.out.println(" "+ActualEZX+ " ");
+                //ActualEZ[Cord] is how far 'forward' the value is from where it needs to be. thus everything else I think follows.
+            // 
  
-
-
-            //Same for iP, a bit redundant though.
-            double iPScaleX=(initialSceneWidth)/innerPane.getMinWidth();
-            double iPScaleY=(initialSceneHeight)/innerPane.getMinHeight();
-            double iPPriorityScale=min(iPScaleX, iPScaleY);
-            innerPane.setScaleX(iPPriorityScale);
-            innerPane.setScaleY(iPPriorityScale);
-            System.out.println("Priority Scale:\neZ: "+eZPriortyScale+"\n iP: "+iPPriorityScale);
-            expandableZone.setLayoutX(0);
-            expandableZone.setLayoutY(0);
-            innerPane.setLayoutX(15);
-            innerPane.setLayoutY(15);
+            //This worked, sorta?
+            }
         }
 
-            //Perhaps a view port needs to be made?
-                //backBone.setTopAnchor(innerPane, innerPane.getLayoutY());
-                //backBone.setLeftAnchor(innerPane, innerPane.getLayoutX());
-                //backBone.setTopAnchor(expandableZone, expandableZone.getLayoutY());
-                //backBone.setLeftAnchor(expandableZone, expandableZone.getLayoutX());
-         /**/
-         
+          
         
-        double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth());
-        double ActualEZX = (initialSceneWidth - ActualEZW)/2;  
-        //Assume equal pull from zooms.
-        expandableZone.setLayoutX(.5*ActualEZW*(-1));//move left by half of your zoom.
-        //This worked, sorta?
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         setReport(root, 1); 
         //Add circles
