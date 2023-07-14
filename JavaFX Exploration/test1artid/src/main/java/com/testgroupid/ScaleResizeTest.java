@@ -121,6 +121,20 @@ public class ScaleResizeTest extends Application{
                 new Background(expandableZoneColor); 
             //#endregion
     
+        //#regiondouble 
+            //Note eZ's info should help derive iP's
+                //Actual pixels taken on screen, rather than objects dimeniosn
+                double ActualEZW=-1; 
+                double ActualEZH=-1;
+                //Desired 'actual' coordinate in Parent Anchorpane
+                double ActualEZY =-1;
+                double ActualEZX=-1;
+                //Scales' used for comparison when determining default scale
+                double eZScaleX=-1;
+                double eZScaleY=-1;
+                //Default scale, based on dimensions of eZ. Determines both eZ and iP. Or should.
+                double eZPriortyScale=-1;
+        //#endregion
 
 
 
@@ -201,6 +215,28 @@ public class ScaleResizeTest extends Application{
             return Double.MAX_VALUE; //to signal bad
         }
         
+
+    public void addCheckers(Pane checkerMe){
+        //make 1x1 rectangle nodes,  
+        boolean toColor=false;
+        for (int row=0; row<checkerMe.getMinHeight(); row++){
+            for (int col =0; col<checkerMe.getMinWidth(); col++) {
+                if (toColor){
+                    checkerMe.getChildren().add(new Rectangle(1, 1, Paint.valueOf("blue")));
+                    checkerMe.getChildren().get(checkerMe.getChildren().size()-1).setLayoutX(row);
+                    checkerMe.getChildren().get(checkerMe.getChildren().size()-1).setLayoutY(col);
+                  }
+                  toColor=!toColor; //flip switch.
+            }
+        } 
+
+    }
+    public void removeCheckers(Pane uncheckerMe){
+        uncheckerMe.getChildren().clear(); //Naive function, just naming convention suggests use after add checkers.
+        //Future, extend rectangel class t oa 'checkers' class, so that I can more easily filter them out of the chidlren.
+    }
+
+
     public Stage setDefaultsStage(Stage stage){ 
         
         //Additional elements
@@ -426,7 +462,10 @@ public class ScaleResizeTest extends Application{
         Group root = new Group();  
         Scene scene = new Scene(root, initialSceneWidth, 
             initialSceneHeight, defaultSceneColor);
+
+        System.out.println("Attempt default stages");
         stage=this.setDefaultsStage(stage);  
+        System.out.println("icons loaded.");
         //Set and show the scene on the stage.
         stage.setScene(scene);  
         stage.show();  //IF THIS IS MOVED, THINGS DON:T GO SUPER WELL. WHY?
@@ -458,6 +497,10 @@ public class ScaleResizeTest extends Application{
  
 
 
+        //#region 
+            ///This sets' up the default Layout X and Y for EZ, and default scale.
+            
+
         //Resize the zones. Should be compatible with any number of positive values.  
         //resizeExpandableZoneX((initialExpandableZoneWidth)*2);//820
         //resizeExpandableZoneY((initialExpandableZoneHeight)*2);//820  
@@ -465,55 +508,73 @@ public class ScaleResizeTest extends Application{
         //resizeExpandableZoneX((initialExpandableZoneWidth));//410
         //resizeExpandableZoneY((initialExpandableZoneHeight));//410
 
-        resizeExpandableZoneX((initialExpandableZoneWidth/2));//205
-        resizeExpandableZoneY((initialExpandableZoneHeight/2));//205
+        //resizeExpandableZoneX((initialExpandableZoneWidth/2));//205
+        //resizeExpandableZoneY((initialExpandableZoneHeight/2));//205
+        resizeExpandableZoneX(41);//205
+        resizeExpandableZoneY(41);//205 
+        
         innerPane.setVisible(false);
         //Protocol
+        //Assuming our default dimensions are not originally 10x10 pixels or less.... Hm :/
+        //Figure out zoom min and max
+            //Zoom min found, zoom max, 
+        double minPixelZoom =10; //Minimum number of pixels to display on a maximum zoom.
+        double helper =-1; //helper is to be a container for figuring out dimension stuff, if we only need one of the two.
+        double minZoom=-1;
+        double maxZoom=-1;
+        if (expandableZone.getMinWidth()<=expandableZone.getMinHeight()){
+            helper = expandableZone.getMinWidth();
+        } else {
+            helper=expandableZone.getMinHeight();
+        } 
+        //Helper requires least amount of scale to get up to or down to 10 pixels.
+        
         if (expandableZone.getWidth()!=initialSceneWidth ||
         expandableZone.getHeight()!=initialSceneHeight){ //let's run this first one always to get initials regardless of dimensions. later we should check though properly.
         //BUG: getWidht, Height return 0's. 
 
+        //Main DEAL: Find the layout X and Y that makes the zoom centered on the window. 
             if (expandableZone.getMinWidth()<=initialSceneWidth && expandableZone.getMinHeight() <=initialSceneHeight) {
+            //if Smaller than backBone
                 //First figure out scale
-                    double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
-                    double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
-                    //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
-                    double eZPriortyScale=Math.min(eZScaleX,eZScaleY);
+                 
+                    eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
+                    eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
+                 
+                //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
+                    eZPriortyScale=Math.min(eZScaleX,eZScaleY);
+                    //Take account 'max' zoom allowed, using the minPixelZoom, minimum amout of pixels alowed.
+                    
+                      
                     expandableZone.setScaleX(eZPriortyScale);
                     expandableZone.setScaleY(eZPriortyScale); 
                 //account for buffer, then get difference from 'ideal' square of ScreenDim-buffer, and the actual shape.
                     //TEST: for smaller than 410, might need actualW actualH getMinW getMinH etc. like below. In that case same algorithm except for finding priority scale. 
                 
-            //Now figure actual width and height based on scale:
-                double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth()); 
-                double ActualEZH=(expandableZone.getScaleY()*expandableZone.getMinHeight()); 
-                double ActualEZY =initialSceneHeight-eZtoAnchorY-expandableZone.getMinHeight(); //Different from if it was larger than the screen!
-                double ActualEZX =initialSceneWidth-eZtoAnchorX-expandableZone.getMinWidth();  
+                //Now figure actual width and height based on scale:
+                ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth()); 
+                ActualEZH=(expandableZone.getScaleY()*expandableZone.getMinHeight()); 
+                ActualEZY =initialSceneHeight-eZtoAnchorY-expandableZone.getMinHeight(); //Different from if it was larger than the screen!
+                ActualEZX =initialSceneWidth-eZtoAnchorX-expandableZone.getMinWidth();  
                 expandableZone.setLayoutY((ActualEZY+eZtoAnchorY)/2);
                 expandableZone.setLayoutX((ActualEZX+eZtoAnchorX)/2);
                 System.out.println(ActualEZX+" "+eZtoAnchorX + " "+initialSceneWidth +" "+ expandableZone.getMinWidth());
-                //S.w=10+2*?+actualwidth, so 
-                //2*? =10+actualWidth -S.2
                 
             }
             else {
+            //if Larger than backbone (1 dim at least)
             //First figure out scale
-            double eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
-            double eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
+                eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
+                eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight();
             //Prioritize getting all in frame, we do not to 'warp' the image by setting the scale of X or Y independently
-            double eZPriortyScale=Math.min(eZScaleX,eZScaleY);
-            expandableZone.setScaleX(eZPriortyScale);
-            expandableZone.setScaleY(eZPriortyScale); 
+                eZPriortyScale=Math.min(eZScaleX,eZScaleY);
+                expandableZone.setScaleX(eZPriortyScale);
+                expandableZone.setScaleY(eZPriortyScale); 
             //Now figure actual width and height based on scale:
-            double ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth()); 
-            double ActualEZH=(expandableZone.getScaleY()*expandableZone.getMinHeight()); 
-            double ActualEZX=(expandableZone.getMinWidth()-ActualEZW)/2; //The space taken up discrpency, 'excess' space left by the zoom out, or receeded space.
-            double ActualEZY=(expandableZone.getMinHeight()-ActualEZH)/2; //The space taken up discrpency, 'excess' space left by the zoom out, or receeded space.
-            //Original size of eZ, minus 
-            //recessed space =840-420 (getMinW, minus actual displayed Wid), 
-            //Divide by 2 to get how far left we should go, our new 'default' layout X? 
-            //Assume equal pull from zooms.
-            
+                ActualEZW=(expandableZone.getScaleX()*expandableZone.getMinWidth()); 
+                ActualEZH=(expandableZone.getScaleY()*expandableZone.getMinHeight()); 
+                ActualEZX=(expandableZone.getMinWidth()-ActualEZW)/2; //The space taken up discrpency, 'excess' space left by the zoom out, or receeded space.
+                ActualEZY=(expandableZone.getMinHeight()-ActualEZH)/2; //The space taken up discrpency, 'excess' space left by the zoom out, or receeded space. 
             //ActualX, Y are treated sort of like the zoom if it was smaller than the frame. These are like 'counter buffers' eZtoAnchor.
             //ActualW, H are treated sort of like the getwidth hegiht if it was smaller than the frame. 
             expandableZone.setLayoutY((eZtoAnchorY)/2 -ActualEZY);
@@ -521,16 +582,42 @@ public class ScaleResizeTest extends Application{
             System.out.println(" "+eZtoAnchorX + " "+initialSceneWidth +" "+ ActualEZW);
             System.out.println(" "+ActualEZX+ " ");
                 //ActualEZ[Cord] is how far 'forward' the value is from where it needs to be. thus everything else I think follows.
-            // 
- 
-            //This worked, sorta?
+              
             }
         }
+        
+        //Max zoom shouldn't account for buffer, since the whole area should be taken with 10 pixels if allowed.
+        //Min and Max zoom figure out. 
+        maxZoom=minPixelZoom*Math.min(initialSceneHeight, initialSceneWidth)/Math.max(expandableZone.getMinWidth(), expandableZone.getMinHeight()); //display at max zoom at least 10 pixels. 
+        //Either its 41*410/10 or 410/41 (to fill screen), * 41/10 (to get 10 pixels from 41 displayed)
+        double IdealScale=-1;
+        minZoom=expandableZone.getScaleX();//scales should be hte same.
+        if (helper/minPixelZoom <1) { //Maxzoom requires providing 10 pixels we don't have. 
+        //Ideal Scale if we had our minPixelZoom fully.
+        IdealScale =Math.max(initialSceneWidth/minPixelZoom,initialSceneHeight/minPixelZoom);
+        //now this is the scale to set the dimensions smaller than our minPixelZoom
 
+            maxZoom=IdealScale;  //Just show what pixels you do have.
+            minZoom=IdealScale;  //Can't zoom out, everything is alerady on display.
+            expandableZone.setScaleX(IdealScale);
+            expandableZone.setScaleY(IdealScale);
+        }
+        System.out.println("Zoom min, max = ("+minZoom+", "+maxZoom+"), ideal based on minPixelZoom ["+minPixelZoom+"]"+IdealScale);
+        zoomBar.setMax(maxZoom);
+        zoomBar.setMin(minZoom);
+        zoomBar.setValue(minZoom); //default zoomed out the best we can.
           
-        
+        addCheckers(expandableZone);
+
+        //#endregion
         
 
+         
+        
+        
+        //Zoom protocols (if bigger than desired box, smaller tah ndesired box, scenewidth scene height != buffer?)
+        //H/V bars show/hide based on zoom
+        //H/V bars set value and max min based on zoom and where we have zoomed. Note we will have to add a getH bar value and V bar value for when we are eediting it's layoutX/Y
 
 
 
@@ -635,15 +722,20 @@ public class ScaleResizeTest extends Application{
         zoomBar.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                zoomBar.setValue(round(zoomBar.getValue(), .5));
-                System.out.println("Current Value of ScaleBar: "+zoomBar.getValue());
+                //This is for 'snapping' to certain sizes. rBoundry should be determiend in the future
+                //TEMP COM:zoomBar.setValue(round(zoomBar.getValue(), .5));
+                
+                System.out.println("Current Value of zoomBar: "+zoomBar.getValue());
 
                 //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
                 //Node class, double property, old val, new val 
                 innerPane.setScaleX(zoomBar.getValue()/100);
                 innerPane.setScaleY(zoomBar.getValue()/100);
-                expandableZone.setScaleX(zoomBar.getValue()/100);
-                expandableZone.setScaleY(zoomBar.getValue()/100);
+                //expandableZone.setScaleX(zoomBar.getValue()/100);
+                //expandableZone.setScaleY(zoomBar.getValue()/100);
+                //New zoom min and max, dividing by 100 defeats prupose of original calculations. 
+                expandableZone.setScaleX(zoomBar.getValue()); 
+                expandableZone.setScaleY(zoomBar.getValue());
                 setReport(root, 1); 
                 //in addition to figuring it's new dimension, let us figure out a few things:
                 //viewport objects?
