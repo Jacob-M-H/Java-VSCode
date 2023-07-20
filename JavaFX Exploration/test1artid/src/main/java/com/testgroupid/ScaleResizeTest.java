@@ -461,8 +461,13 @@ public class ScaleResizeTest extends Application{
         this.sceneWidth=initialSceneWidth-this.decorW;
     }
 
+
+
     public double figureActualDim(Pane panel, String dim){
         if (dim=="Width" || dim=="wid" ||dim=="W" || dim=="w") {
+            //System.out.println("Old Method (getMinWidth): "+(panel.getMinWidth()*panel.getScaleX()));
+            //System.out.println("Old Method (getWidth): "+(panel.getWidth()*panel.getScaleX()));
+            //System.out.println("New Method: "+ panel.getBoundsInParent().getWidth());
             return panel.getMinWidth()*panel.getScaleX();
         } else if (dim=="Height" || dim=="hei" || dim =="H" || dim=="h"){
             return panel.getMinHeight()*panel.getScaleY();
@@ -470,7 +475,7 @@ public class ScaleResizeTest extends Application{
         System.out.println("WARNING: Misused function figureActualDim Panel:"+ panel.toString() + " "+dim);
         return -1; //an impossible value, as we cannot have negative scale or dimensions.
     }
-    
+     
     
     public double figureActualCord(Pane panel, String cord) {
         if (cord=="X" || cord=="x") {
@@ -481,11 +486,10 @@ public class ScaleResizeTest extends Application{
         System.out.println("WARNING: Misused function figureActualCord Panel:"+panel.toString()+" "+cord);
         return Double.MAX_VALUE; //To signal somethings gone wrong
     }
-
-
-
+ 
 
     public void figureInitialScale(){
+        //TODO: NOTE getWidth and getHeight cannot be used on eZ, returns 0. Thus in the future instead of 'min' we should reference a double value 'initialEZW', or something like that.
         //InitialScale has entire picture in frame, thus H/V bar's are hidden, and their values are set to 0, both min, max, and value.
         
         //H/VBars set by scale.
@@ -514,15 +518,24 @@ public class ScaleResizeTest extends Application{
                 if (expandableZone.getMinWidth()!=initialSceneWidth-eZtoAnchorX ||
                 expandableZone.getMinHeight()!=initialSceneHeight-eZtoAnchorY){  //Edit: eZ compared to 'ideal box' - May have to 'scale up'
                     
-                    //First figure out scale 
+                    //First figure out scale  
                         eZScaleX=(initialSceneWidth-eZtoAnchorX)/expandableZone.getMinWidth();
                         eZScaleY=(initialSceneHeight-eZtoAnchorY)/expandableZone.getMinHeight(); 
                         //Prioritize getting all in frame 
                         eZPriortyScale=Math.min(eZScaleX,eZScaleY);  
+                        //TODO: Check if eZPrioritScale is 1, break after setting required things?
                         expandableZone.setScaleX(eZPriortyScale);
                         expandableZone.setScaleY(eZPriortyScale); 
+                        
+                        //Once again, too early, returns 0. - components have 0 size until GUI shows, which for some reason isn't immeidately after stage.show...
+                            //additionally the component might need to be visible.
+                        //ActualEZW = expandableZone.getBoundsInParent().getWidth();
+                        //ActualEZH = expandableZone.getBoundsInParent().getHeight();
+                        //System.out.println("compare new : "+ ActualEZW+", "+ActualEZH);
                         ActualEZW=figureActualDim(expandableZone, "w"); 
                         ActualEZH=figureActualDim(expandableZone, "h");
+                        
+                        
                         //Actuals are the 'apparent' size in it's parent. -ASSERT: Parent of these panels is scaled 1. unclear what happens if not the case. 
                         //eZPriority scale is the scale required to fit the entire image in scene by default.
 
@@ -546,7 +559,8 @@ public class ScaleResizeTest extends Application{
                     }
                 } 
                 //Both H/W are perfect for the scene and buffer.
-                else{//EDIT: Else scale=1?, no else statement was provided.
+                else{//EDIT: Else scale=1?, no else statement was provided. 
+                    eZPriortyScale=1; //The fit is perfect, thus the scale should be 1.
                     expandableZone.setScaleX(1);
                     expandableZone.setScaleY(1);
                     //set other helper variables.
@@ -568,6 +582,7 @@ public class ScaleResizeTest extends Application{
         //could the buffer be changed.
         
         IdealScale=-1;
+        System.out.println("Check is eZPriority Scale assigned at this time? "+eZPriortyScale);
         minZoom=eZPriortyScale;//scales should be the same.
         if (helper/minPixelZoom <1) { //Maxzoom requires providing 10 pixels we don't have. 
         //Ideal Scale if we had our minPixelZoom fully.
@@ -586,8 +601,21 @@ public class ScaleResizeTest extends Application{
         //ASSERT: Min Window size will always accomodate minPixelZoom?
         //ASSERT: Square windows allowed only right now, otherwise minPixelZoom must account for the ratio.
         //NOTE: Instead of initial scenewidht and height, might have to use some min or maxing potentially. Later tests required.
+        
+        System.out.println("Initial Zoombar: "+ zoomBar.getValue());
+        System.out.println("Zoom bar min, max: "+zoomBar.getMin()+", "+zoomBar.getMax());
+        System.out.println("ExpandableZone Scale: "+expandableZone.getScaleX());
+        zoomBar.setUnitIncrement(.1);
+        System.out.println("ZoomBar step: "+zoomBar.getUnitIncrement());
+        //TODO: Figure out a proper zoomBar increment. Should be based on the dimensions of the frame, minPixelZoom, and the Actualdimensions of the expandablePane. 
+
           
     }
+
+
+
+
+
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
     public void start(Stage stage) throws Exception{ //Stage primaryStage) { //throws Exception {
@@ -645,21 +673,85 @@ public class ScaleResizeTest extends Application{
         //resizeExpandableZoneX((initialExpandableZoneWidth/2));//205
         //resizeExpandableZoneY((initialExpandableZoneHeight/2));//205
         resizeExpandableZoneX(410);//205
-        resizeExpandableZoneY(410);//205  
-
+        resizeExpandableZoneY(410);//205   
+        
         innerPane.setVisible(false); //temporary while setting up eZ. 
           
         figureInitialScale();   
         //#endregion 
+ 
+
          
+        //used for recentering.
+        double initScaleEZX=expandableZone.getLayoutX();
+        double initScaleEZY=expandableZone.getLayoutY();
+        addCheckers(expandableZone); //to track centering
+
+        zoomBar.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                //This is for 'snapping' to certain sizes. rBoundry should be determiend in the future
+                //TEMP COM:zoomBar.setValue(round(zoomBar.getValue(), .5));
+                
+                System.out.println("Current Value of zoomBar: "+zoomBar.getValue());
+
+                //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
+                //Node class, double property, old val, new val 
+                innerPane.setScaleX(zoomBar.getValue()/100);
+                innerPane.setScaleY(zoomBar.getValue()/100);
+                //expandableZone.setScaleX(zoomBar.getValue()/100);
+                //expandableZone.setScaleY(zoomBar.getValue()/100);
+                //New zoom min and max, dividing by 100 defeats prupose of original calculations. 
+                expandableZone.setScaleX(zoomBar.getValue()); 
+                expandableZone.setScaleY(zoomBar.getValue());
+                setReport(root, 1); 
+                 
+                figureActualDim(expandableZone, "w");
 
 
+                
+                //Centering, figuring out HBarMax, then centering the region layout to see if the max seems well.
+                    expandableZone.setLayoutX(initScaleEZX);
+                    //expandableZone.setLayoutY(initScaleEZY); //recenter... 
+                    
+                    System.out.println("eZ new scale "+expandableZone.getScaleX()); 
+                    double HBarMax=initScaleEZX-.5*(expandableZone.getBoundsInParent().getWidth() - expandableZone.getWidth()); 
+                    System.out.println("HBarMax: "+HBarMax);
+                    System.out.println("Adjust X Y based on that");
+                    expandableZone.setLayoutX(HBarMax); //should keep a 5 pixel buffer from the edges 
+                    expandableZone.setLayoutX(initScaleEZX);
+                    double HBarMin= initScaleEZX - expandableZone.getBoundsInParent().getMinX();
+                    System.out.println("HBarMin: "+HBarMin); 
+                    System.out.println("Adjust X Y based on that");
+                    expandableZone.setLayoutX(initScaleEZX+HBarMin);
+
+                //in addition to figuring it's new dimension, let us figure out a few things:
+                //viewport objects?
+                //DimScene - 1/2 new eZ Pane, (now we get the 'leftover' bits of backBone)
+                    // From this left over, divide by 2. Figure out based on the scale how much 'over' it's gone, and readjust the 
+                    //layout to negatives or positives as needed. 
+ 
+            
+            } 
+        });
+         
+        
         expandableZone.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() { //From oracle page on 0 layouts.
             @Override 
             public void changed(ObservableValue<? extends Bounds> obs, Bounds oldBounds, Bounds newBounds) { 
                 System.out.println("get W H working? With layout bound listener?");
                 System.out.println("Old Bounds W, H"+"("+oldBounds.getWidth()+", "+oldBounds.getHeight()+")"); 
                 System.out.println("New Bounds W, H"+"("+newBounds.getWidth()+", "+newBounds.getHeight()+")");  
+            }
+        });
+
+        expandableZone.boundsInParentProperty().addListener(new ChangeListener<Bounds>() { //From oracle page on 0 layouts.
+            @Override 
+            public void changed(ObservableValue<? extends Bounds> obs, Bounds oldBounds, Bounds newBounds) { 
+                //recenter <-will keep calling itself over and over! 
+                //expandableZone.setLayoutX(initScaleEZX);
+                //expandableZone.setLayoutY(initScaleEZY); //recenter... 
+                
             }
         });
 
@@ -796,34 +888,7 @@ public class ScaleResizeTest extends Application{
         //this.resizeScrollableInnerPane();
         
         
-        zoomBar.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                //This is for 'snapping' to certain sizes. rBoundry should be determiend in the future
-                //TEMP COM:zoomBar.setValue(round(zoomBar.getValue(), .5));
-                
-                System.out.println("Current Value of zoomBar: "+zoomBar.getValue());
-
-                //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
-                //Node class, double property, old val, new val 
-                innerPane.setScaleX(zoomBar.getValue()/100);
-                innerPane.setScaleY(zoomBar.getValue()/100);
-                //expandableZone.setScaleX(zoomBar.getValue()/100);
-                //expandableZone.setScaleY(zoomBar.getValue()/100);
-                //New zoom min and max, dividing by 100 defeats prupose of original calculations. 
-                expandableZone.setScaleX(zoomBar.getValue()); 
-                expandableZone.setScaleY(zoomBar.getValue());
-                setReport(root, 1); 
-                //in addition to figuring it's new dimension, let us figure out a few things:
-                //viewport objects?
-                //DimScene - 1/2 new eZ Pane, (now we get the 'leftover' bits of backBone)
-                    // From this left over, divide by 2. Figure out based on the scale how much 'over' it's gone, and readjust the 
-                    //layout to negatives or positives as needed. 
- 
-            
-            } 
-        });
-        
+         
 
         innerPane.setOnMouseEntered(new EventHandler<Event>() { 
             @Override
