@@ -93,8 +93,10 @@ public class ScaleResizeTest extends Application{
         
         AnchorPane expandableZone = new AnchorPane(); 
         ScrollBar zoomBar =new ScrollBar(); 
+        double initScaleEZX=-1;
+        double initScaleEZY=-1;
+        double prevRatioHBar=0.5;
 
-        
         AnchorPane Report=new AnchorPane(); //For displaying information, not required in final version
         //Background stuff 
             //#region
@@ -370,13 +372,13 @@ public class ScaleResizeTest extends Application{
             this.expandableZone.setPrefHeight(height); 
         }
     public void resizeMoveInnerH(double width, double yCord){ 
-            this.moveInnerV.setPrefHeight(scrollbarThick);
-            this.moveInnerV.setMinHeight(scrollbarThick); 
-            this.moveInnerV.setMaxHeight(scrollbarThick);
+            this.moveInnerH.setPrefHeight(scrollbarThick);
+            this.moveInnerH.setMinHeight(scrollbarThick); 
+            this.moveInnerH.setMaxHeight(scrollbarThick);
             this.moveInnerH.setLayoutX(10);  //roughly how far from X axis I want to be
             this.moveInnerH.setLayoutY(yCord-scrollbarThick+1); //roughly the height of the scrollbar   
             this.moveInnerH.setMaxWidth(width-25);
-            this.moveInnerH.setMinWidth(width-25);
+            this.moveInnerH.setMinWidth(width-25); 
         }
     public void resizeMoveInnerV(double height, double xCord){
             this.moveInnerV.setPrefWidth(scrollbarThick);
@@ -462,7 +464,7 @@ public class ScaleResizeTest extends Application{
     }
 
 
-
+    //TODO: Just use getbounds in parent, 
     public double figureActualDim(Pane panel, String dim){
         if (dim=="Width" || dim=="wid" ||dim=="W" || dim=="w") {
             //System.out.println("Old Method (getMinWidth): "+(panel.getMinWidth()*panel.getScaleX()));
@@ -475,8 +477,6 @@ public class ScaleResizeTest extends Application{
         System.out.println("WARNING: Misused function figureActualDim Panel:"+ panel.toString() + " "+dim);
         return -1; //an impossible value, as we cannot have negative scale or dimensions.
     }
-     
-    
     public double figureActualCord(Pane panel, String cord) {
         if (cord=="X" || cord=="x") {
 
@@ -488,6 +488,7 @@ public class ScaleResizeTest extends Application{
     }
  
 
+        
     public void figureInitialScale(){
         //TODO: NOTE getWidth and getHeight cannot be used on eZ, returns 0. Thus in the future instead of 'min' we should reference a double value 'initialEZW', or something like that.
         //InitialScale has entire picture in frame, thus H/V bar's are hidden, and their values are set to 0, both min, max, and value.
@@ -614,7 +615,52 @@ public class ScaleResizeTest extends Application{
 
 
 
+    public void reboundMoveInnerH(double HBarMin, double HBarMax){
+             //The center is going to be ratio based. 
+                    //if negative, abs ; if positive, add 1/2 max.
+                    //Then figure out what the ratio is on it's position (from the left)
+                //Now, when the zoom is changed, we figure out the H/V bar positions based on what the ratio was.
+                //The base is 50%,
+                //If if the bar was hidden, set value as 0,
+                //If the value was not hidden, set new bounds for H/V Bar, and then figure out the psotion.
+            //Should it be shown?
 
+            //CANNOT REVERSE, if min>max scrollbar bugs.
+            moveInnerH.setMin(HBarMin);
+            moveInnerH.setMax(HBarMax);
+            if (HBarMax==HBarMin){ 
+                moveInnerH.setVisible(false);
+            } else{
+                moveInnerH.setVisible(true);
+            }
+            
+            System.out.println("\nold value: "+moveInnerH.getValue());  
+            //set value of the Bar, if it's visible or not.
+            if (!moveInnerH.isVisible()){
+                System.out.println("HBar was not visisble (max==min)");
+                moveInnerH.setValue(0); //0 is the mid point.
+                prevRatioHBar=0.5; 
+            } else{ //Scrollbar was visible before the zoom
+                System.out.println("HBar was visisble");
+                //moveInnerH.setPadding(new Insets(0, moveInnerH.getMax()-.5, 0, moveInnerH.getMax()-.5)); //leaves about 1 width, 
+                if (prevRatioHBar<.5) { //it was negative 
+                    System.out.println("Ratio: "+prevRatioHBar+", Max: "+moveInnerH.getMax()+"\n");
+                    moveInnerH.setValue(-(prevRatioHBar*(moveInnerH.getMax()*2)) ); //This isn't right?
+                    System.out.println("[-] new value: "+moveInnerH.getValue());  
+                } else{ //it was positive
+                    System.out.println("Ratio: "+prevRatioHBar+", Max: "+moveInnerH.getMax()+"\n");
+                    moveInnerH.setValue((prevRatioHBar*moveInnerH.getMax()*2)-moveInnerH.getMax());
+                    System.out.println("[+] new value: "+moveInnerH.getValue());  
+                } 
+            }  
+    }
+
+    public void CheckThings(){
+        System.out.println(
+            "\ninitial [scaled] X: "+initScaleEZX +"\n"+
+            "hBar value: "+moveInnerH.getValue()+"\n"
+        );
+    }
 
 
     @Override //it gets upset at me if I don't have hte Stage stage argument
@@ -633,7 +679,7 @@ public class ScaleResizeTest extends Application{
         Scene scene = new Scene(root, initialSceneWidth, 
             initialSceneHeight, defaultSceneColor);
         stage=this.setDefaultsStage(stage);  
-        System.out.println("icons loaded.");
+        System.out.println("icons loaded."); //NOTE If it doesn't load, often times it just needs a fresh save. Not sure if the compiler actively checks or if VS Code is doing something funky.
         //Set and show the scene on the stage.
         stage.setScene(scene);  
         stage.show();  //IF THIS IS MOVED, THINGS DON:T GO SUPER WELL. WHY?
@@ -678,60 +724,51 @@ public class ScaleResizeTest extends Application{
         innerPane.setVisible(false); //temporary while setting up eZ. 
           
         figureInitialScale();   
-        //#endregion 
- 
+        //#endregion  
 
          
-        //used for recentering.
-        double initScaleEZX=expandableZone.getLayoutX();
-        double initScaleEZY=expandableZone.getLayoutY();
-        addCheckers(expandableZone); //to track centering
+        //used for recentering -zoom, H/V Bar.
+            initScaleEZX=expandableZone.getLayoutX();
+            initScaleEZY=expandableZone.getLayoutY();
+            addCheckers(expandableZone); //to track centering
 
         zoomBar.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
                 //This is for 'snapping' to certain sizes. rBoundry should be determiend in the future
-                //TEMP COM:zoomBar.setValue(round(zoomBar.getValue(), .5));
-                
-                System.out.println("Current Value of zoomBar: "+zoomBar.getValue());
-
+                //TEMP COM:zoomBar.setValue(round(zoomBar.getValue(), .5));  
                 //System.out.println("DecipherV: "+arg0+" "+ arg1+" "+arg2);
-                //Node class, double property, old val, new val 
-                innerPane.setScaleX(zoomBar.getValue()/100);
-                innerPane.setScaleY(zoomBar.getValue()/100);
-                //expandableZone.setScaleX(zoomBar.getValue()/100);
-                //expandableZone.setScaleY(zoomBar.getValue()/100);
+                //Node class, double property, old val, new val  
+                
                 //New zoom min and max, dividing by 100 defeats prupose of original calculations. 
+                System.out.println("ZoomBar Triggered");
                 expandableZone.setScaleX(zoomBar.getValue()); 
                 expandableZone.setScaleY(zoomBar.getValue());
-                setReport(root, 1); 
-                 
-                figureActualDim(expandableZone, "w");
-
-
-                
+                setReport(root, 1);  
+                figureActualDim(expandableZone, "w"); //get bounds in parent 
                 //Centering, figuring out HBarMax, then centering the region layout to see if the max seems well.
                     expandableZone.setLayoutX(initScaleEZX);
-                    //expandableZone.setLayoutY(initScaleEZY); //recenter... 
-                    
-                    System.out.println("eZ new scale "+expandableZone.getScaleX()); 
-                    double HBarMax=initScaleEZX-.5*(expandableZone.getBoundsInParent().getWidth() - expandableZone.getWidth()); 
-                    System.out.println("HBarMax: "+HBarMax);
-                    System.out.println("Adjust X Y based on that");
-                    expandableZone.setLayoutX(HBarMax); //should keep a 5 pixel buffer from the edges 
-                    expandableZone.setLayoutX(initScaleEZX);
-                    double HBarMin= initScaleEZX - expandableZone.getBoundsInParent().getMinX();
-                    System.out.println("HBarMin: "+HBarMin); 
-                    System.out.println("Adjust X Y based on that");
-                    expandableZone.setLayoutX(initScaleEZX+HBarMin);
+                    //expandableZone.setLayoutY(initScaleEZY); //recenter...  
+                    //double HBarMax=  -.5*(expandableZone.getBoundsInParent().getWidth() - expandableZone.getWidth()); KEEP, this is another logical way of obtaining HBarMax 
+                    double HBarMax= initScaleEZX - expandableZone.getBoundsInParent().getMinX(); 
+                    //testcase
+                    //expandableZone.setLayoutX(initScaleEZX+HBarMax); //should keep a 5 pixel buffer from the edges
+                    //since we assume shape is centered,
+                    double HBarMin=-1*HBarMax; 
+                    //test case
+                    //expandableZone.setLayoutX(initScaleEZX+HBarMax); //NOTE This means there is a total of 10 extra pixels left or right the pane can go, how this scalse for H and V Bar unclear. 
+                    //Figure relative center
+                    reboundMoveInnerH(HBarMin, HBarMax); //side effect: retains the value ofthe scrollbar
+                    //moveInnerH.setVisibleAmount(1); 
+                        //in addition to figuring it's new dimension, let us figure out a few things:
+                        //viewport objects?
+                        //DimScene - 1/2 new eZ Pane, (now we get the 'leftover' bits of backBone)
+                            // From this left over, divide by 2. Figure out based on the scale how much 'over' it's gone, and readjust the 
+                            //layout to negatives or positives as needed. 
 
-                //in addition to figuring it's new dimension, let us figure out a few things:
-                //viewport objects?
-                //DimScene - 1/2 new eZ Pane, (now we get the 'leftover' bits of backBone)
-                    // From this left over, divide by 2. Figure out based on the scale how much 'over' it's gone, and readjust the 
-                    //layout to negatives or positives as needed. 
- 
-            
+                    //Set new value, -1 is to match direction of the scrollbar movement.
+                    expandableZone.setLayoutX(initScaleEZX+(-1*moveInnerH.getValue())); //the moveinnerH value might have to be scaled? 
+                    System.out.println("ZoomBar Over");
             } 
         });
          
@@ -757,7 +794,7 @@ public class ScaleResizeTest extends Application{
 
 
 
-
+/* Not sure if this is needed still 
         
         //Now attempt to deal with H and V bar stuff
         //From if smaller than stage.
@@ -787,7 +824,7 @@ public class ScaleResizeTest extends Application{
         //Zoom protocols (if bigger than desired box, smaller tah ndesired box, scenewidth scene height != buffer?)
         //H/V bars show/hide based on zoom
         //H/V bars set value and max min based on zoom and where we have zoomed. Note we will have to add a getH bar value and V bar value for when we are eediting it's layoutX/Y
-
+ */
 
 
 
@@ -859,16 +896,21 @@ public class ScaleResizeTest extends Application{
 
          //Add listeners.
         moveInnerH.valueProperty().addListener(new ChangeListener<Number>()  { 
+            //KEEP: Note that if we wish to allow the scroll bar to 'teleport' on click, we will need to make a flag to take the change value (if it's not already arg2) without taking ratios and other things into account.
             @Override
             public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-                moveInnerH.setValue(round(moveInnerH.getValue(), 1));
-                System.out.println("Current Value of moveInnerH: "+moveInnerH.getValue());
-                //moveInnerH=round(moveInnerH.getValue(),.05);
-
-                //System.out.println("DecipherH: "+arg0+" "+ arg1+" "+arg2);
-                innerPane.setLayoutX(innerPane.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
-                expandableZone.setLayoutX(expandableZone.getLayoutX()+(arg2.doubleValue()-arg1.doubleValue()));
-                setReport(root, 1);
+                System.out.println("moveInnerH Listener Triggered");
+                moveInnerH.setValue(round(moveInnerH.getValue(), 1));  
+                setReport(root, 1); 
+                //for zoom center preservation.
+                if (moveInnerH.getValue()<0) { 
+                    prevRatioHBar=Math.abs(moveInnerH.getValue())/(moveInnerH.getMax()*2); 
+                } else{  
+                    prevRatioHBar=(moveInnerH.getValue()+moveInnerH.getMax())/(moveInnerH.getMax()*2); 
+                }
+                //double changeVal=(arg2.doubleValue()-arg1.doubleValue()); 
+                expandableZone.setLayoutX(initScaleEZX + (-1*moveInnerH.getValue()));
+                System.out.println("moveInnerH Listener Over");
             } 
             
         });
@@ -893,25 +935,25 @@ public class ScaleResizeTest extends Application{
         innerPane.setOnMouseEntered(new EventHandler<Event>() { 
             @Override
             public void handle(Event event){
-                System.out.println("InnerPane " + event.getEventType());
+                //System.out.println("InnerPane " + event.getEventType());
             }
         });
         innerPane.setOnMouseExited(new EventHandler<Event>() { 
             @Override
             public void handle(Event event){
-                System.out.println("InnerPane " + event.getEventType());
+                //System.out.println("InnerPane " + event.getEventType());
             }
         });
         backBone.setOnMouseEntered(new EventHandler<Event>() { 
             @Override
             public void handle(Event event){
-                System.out.println("backPane " +event.getEventType());
+                //System.out.println("backPane " +event.getEventType());
             }
         });
         backBone.setOnMouseExited(new EventHandler<Event>() { 
             @Override
             public void handle(Event event){
-                System.out.println("backPane "+event.getEventType());
+                //System.out.println("backPane "+event.getEventType());
             }
         });
  
