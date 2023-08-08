@@ -540,16 +540,10 @@ public class ScaleResizeTest extends Application{
                         expandableZone.setScaleX(eZPriortyScale);
                         expandableZone.setScaleY(eZPriortyScale); 
                         
-                        //Once again, too early, returns 0. - components have 0 size until GUI shows, which for some reason isn't immeidately after stage.show...
-                            //additionally the component might need to be visible.
-                        //ActualEZW = expandableZone.getBoundsInParent().getWidth();
-                        //ActualEZH = expandableZone.getBoundsInParent().getHeight();
-                        //System.out.println("compare new : "+ ActualEZW+", "+ActualEZH);
+                         
                         ActualEZW=figureActualDim(expandableZone, "w"); 
                         ActualEZH=figureActualDim(expandableZone, "h");
-                        
-                        
-                        //Actuals are the 'apparent' size in it's parent. -ASSERT: Parent of these panels is scaled 1. unclear what happens if not the case. 
+                         //-ASSERT: Parent of these panels is scaled 1. unclear what happens if not the case. 
                         //eZPriority scale is the scale required to fit the entire image in scene by default.
 
                 //Main DEAL: Find the layout X and Y that makes the zoom centered on the window. 
@@ -1042,7 +1036,7 @@ public class ScaleResizeTest extends Application{
             this.resizeScrollable(0,newVal.doubleValue()-oldVal.doubleValue());
         }); 
         
-
+        
 
 
 
