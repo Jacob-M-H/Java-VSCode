@@ -44,4 +44,8 @@ Note on the bliping of images.
     The test folder for my purposes isn't super required, so I will investigate that as a project develops, or I hit a road block that prevents my progress.
     Currently, I'll see about making a hello world program through Maven's src/main/java, and get rid of everything else I can. 
     Then, once I confirm I can make things run in Maven, and the general features a bit more than I currently do, I'll start making some test JavaFX applications.
-    
+
+
+
+8/20/23
+/JavaFX Exploration/test1artid/src/main/java/com/testgroupid is the path to follow to see 'RectangleBugInvestigation', which has the culmination of current work. JavaFX has some odd quirks mentioned in the code journal regarding updating dimensions, retaining dimensions, and the order in which things are allowed to happen which went unexplained or described in any online literature I could find. Eventually these bugs will be reported in a seperate text file to aid future programmers using JavaFX. 
