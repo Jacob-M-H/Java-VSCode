@@ -1254,10 +1254,12 @@ public void reboundMoveInnerV2(double RatioScale){
                     case 14:  
                         testScale2(11,11, primStage, 420, 420); 
                         System.out.println("Very small EZ > minPixelZoom");
+                        System.out.println("ZoomBar min Max "+zoomBar.getMin()+", "+zoomBar.getMax());
                         break; 
                     case 15:  
                         testScale2(9,9, primStage, 420, 420); 
                         System.out.println("Very small EZ < minPixelZoom");
+                        System.out.println("ZoomBar min Max "+zoomBar.getMin()+", "+zoomBar.getMax());
                         break; 
                     case 16:  
                         testScale2(195,195, primStage, 420, 420);  
