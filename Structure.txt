@@ -1,0 +1,20 @@
+
+Parent 
+->Event E of Parent Trigger(s) [A Event T] Event below 
+    Child(ren)
+    ->Event T triggers event triggers events etc
+
+
+Window 
+->Dim Change [Dim Change]
+    Window region [Panel?] 
+    ->Dim Change [Dim Change]
+        Window Ribbon(s)
+        ->Left Right Shrink
+        Window Column(s)
+        ->Top Bot Shrink
+        Window Canvas
+        ->Zoom Level relative shouldn't change. The max/min zoom is calculated with the max window dimension. If buffer reached while expanding hsould 'pull' on that object's relative position.
+
+        
+
