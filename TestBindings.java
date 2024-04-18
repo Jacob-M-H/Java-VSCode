@@ -43,5 +43,8 @@ public class TestBindings {
 
         System.out.println("Post format");
         System.out.println(s1);    
-    } 
+    }
+    
+    //TODO: Test bidirectional bindings vs binding. Bidirectional bindings may be useful to lock items to certain scale, while bindings may be nice to move bounds as required.
+    //A double bind isn't a terrible idea either, but there is testing that need to be done to evaluate the behavior.
 }

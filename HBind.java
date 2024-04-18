@@ -13,6 +13,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 //Toolkit java.awt may be required.
     
 //JavaFX runtime components are missing and are requried to run this aplication. 
@@ -23,7 +25,7 @@ import javafx.stage.Stage;
     //Launch.json add "vmArgs": "--module-path /Users/<user>/Downloads/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.fxml", isnide config of file want to use javafx in (obv change path to where javafx lib is).
     
 
-public class JHMain extends Application{
+public class HBind extends Application{
     Stage window;
     Scene appScene;
     private double minWidth;
@@ -106,6 +108,19 @@ public class JHMain extends Application{
     }
 
 
+    public void setBinds(Stage bindTo, Pane boundFeature){
+        bindTo.getProperties(); //Assert window has properties
+        bindTo.widthProperty();
+        bindTo.heightProperty();
+
+         
+
+
+        boundFeature.minHeightProperty().bind(bindTo.heightProperty().subtract(0));
+        boundFeature.maxHeightProperty().bind(bindTo.heightProperty().subtract(0));
+
+
+    }
 
     public void setMinBounds(double wMin,double hMin, boolean systemSize){
         if (systemSize){

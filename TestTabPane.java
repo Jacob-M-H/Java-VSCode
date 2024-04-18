@@ -1,3 +1,4 @@
+import javafx.beans.binding.NumberBinding;
 import javafx.geometry.Insets;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -8,7 +9,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 //Goal is for additional functionalities to be tracked within this subclass. For example if I run into a feature Ireally want. Such as tab pane enforcement across all tabs.
-public class TestTabPane extends TabPane{ 
+
+//Note the Pane for addPane to Tab should be a subclass of Pane, with static properties that each Pane will look at for H/V Bars/zoom/LayoutX/Y. This allows all layers to remain in synch with each other.
+public class TestTabPane extends TabPane implements bindingInterface{ 
     TabPane tp;
     TestTabPane(){
         System.err.println("Make new TestTabPane");  
@@ -24,11 +27,11 @@ public class TestTabPane extends TabPane{
         this.getTabs().add(idx, newTab);
     }
     public void addPaneToTab(int idx, Pane panel){ 
-        System.err.println("Add Pane to Tab");
+        System.err.println("Add Pane to Tab 2");
         this.getTabs().get(idx).setContent(panel);
     }
     public void addPaneToTab(Pane panel){ 
-        System.err.println("Add Pane to Tab");
+        System.err.println("Add Pane to Tab 1");
         int end=this.getTabs().size()-1;
         this.getTabs().get(end).setContent(panel);
     }
@@ -45,9 +48,48 @@ public class TestTabPane extends TabPane{
         */
     
     }
-
+    @Override
+    public boolean bindParent(bindingInterface parent, String prop, NumberBinding bindingOperation) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'bindParent'");
+    }
+    @Override
+    public boolean[] bindParent(bindingInterface parent, String[] props, NumberBinding[] bindingOperations) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'bindParent'");
+    }
+    @Override
+    public boolean unbindParent(bindingInterface parent, String prop) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'unbindParent'");
+    }
+    @Override
+    public boolean[] unbindParent(bindingInterface parent, String[] props) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'unbindParent'");
+    }
+    @Override
+    public boolean bindChild(bindingInterface child, String prop, NumberBinding bindingOperation) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'bindChild'");
+    }
+    @Override
+    public boolean[] bindChild(bindingInterface child, String[] props, NumberBinding[] bindingOperations) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'bindChild'");
+    }
+    @Override
+    public boolean unbindChild(bindingInterface child, String prop) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'unbindChild'");
+    }
+    @Override
+    public boolean[] unbindChild(bindingInterface child, String[] props) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'unbindChild'");
+    }
     
-
+//See implementation of + button and perhaps extend it to model 'locked', 'hidden', and 'grouped' tabs. [grouped tabs should treat all panes as a singular pane and simply store a way to reverse the grouping at the index of the merged tab.]
 
 
 }
