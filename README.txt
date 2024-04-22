@@ -44,4 +44,8 @@ Note on the bliping of images.
     The test folder for my purposes isn't super required, so I will investigate that as a project develops, or I hit a road block that prevents my progress.
     Currently, I'll see about making a hello world program through Maven's src/main/java, and get rid of everything else I can. 
     Then, once I confirm I can make things run in Maven, and the general features a bit more than I currently do, I'll start making some test JavaFX applications.
+
+
+4/22/24
+    Updating, so instead of using Maven - as I care little for it as of now - I found out the VmArgs to update in the Launch.json, and made a stack overflow about the "" required around the launch path. Currently investigating Canvas drawing features for later use in the project with basic shapes and draggable objects before painting into the canvas. Later will investigate how JavaFX uses threading with the canvas, and how the objects are stored within, as if I can leverage those data objects I will. 
     
