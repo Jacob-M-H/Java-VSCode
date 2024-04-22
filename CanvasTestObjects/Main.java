@@ -71,23 +71,32 @@ public class Main extends Application{
                 } 
                 System.out.printf("Button Val: %s\n", strokeNotes.get(drawStroke));
                 
+                gc.setLineWidth(5);
                 switch(strokeNotes.get(drawStroke)){ 
-                    case "First Stroke":
-                        System.out.println("Please draw something!");
-                        
-                        gc.arc(250,250, 100, 50, 180, 300); 
-                        
+                    case "First Stroke":   
+                        gc.beginPath();
+                        gc.arc(400,400, 50, 25, 180, 300); 
                         gc.setFill(Color.GREEN);
                         gc.setStroke(Color.BLUE);
-                        gc.fillArc(250,250, 100,100, 0, 180, ArcType.ROUND);
-                        
-                        gc.setFill(Color.BLUE);
-                        gc.setStroke(Color.GREEN);
-                        gc.fillArc(250,250, 100,100, 90, 180, ArcType.ROUND);
-                        //Start at 90 degrees with the 'draw line' rotating counter clockwise as degres work like that. Okay
+                        gc.fill();
+                        gc.stroke();
+                        gc.closePath();  
 
-                        gc.fill();  //fill the path.
+                        gc.setFill(Color.YELLOW);
+                        gc.setStroke(Color.VIOLET);
+                        gc.beginPath();
+                        gc.fillArc(250,250, 100,100, 0, 180, ArcType.ROUND);
+                        gc.strokeArc(250,250, 100,100, 0, 180, ArcType.ROUND);
+                        gc.closePath();
+                        gc.stroke(); //outline  
+ 
+                        gc.setFill(Color.BLUE);
+                        gc.setStroke(Color.RED);
+                        gc.fillArc(250,250, 100,100, 90, 180, ArcType.ROUND);
                         gc.stroke(); //outline
+                        gc.closePath();
+                        //Start at 90 degrees with the 'draw line' rotating counter clockwise as degres work like that. Okay 
+
                         //CenterX, CenterY, RadiusX, RadiusY - ellipse
                         //StartAngle, Length <- ?
                         break;
@@ -107,8 +116,7 @@ public class Main extends Application{
                         break;
                     case "LineBezierLineWithoutMove"://odd
                         gc.setFill(Color.BLACK);
-                        gc.setStroke(Color.RED);
-                        gc.setLineWidth(5);
+                        gc.setStroke(Color.RED); 
 
                         gc.beginPath();
                         gc.moveTo(50,50); //Quesiton where is the default coordinates of moveTo
@@ -127,9 +135,7 @@ public class Main extends Application{
                         gc.closePath();
                         gc.stroke();
                         gc.fill();  
-                        break;
-
-
+                        break; 
                     case "bezierCurve": //works.
                         gc.setFill(Color.BLACK);
                         gc.setStroke(Color.RED);
