@@ -60,7 +60,13 @@ public class Main extends Application{
         //strokeNotes.add("Reset");
         //strokeNotes.add("LineBezierLine");
         //strokeNotes.add("Reset"); 
-        this.changeButtonName(drawButton, strokeNotes.get(drawStroke));
+        strokeNotes.add("testOrderFillCloseStroke");//HUGE Difference!
+        strokeNotes.add("Reset"); 
+        strokeNotes.add("testArcFillStrokeVSArcFillArcFillStroke"); //HUGE difference
+        strokeNotes.add("Reset"); 
+        strokeNotes.add("testArcTypes");
+        strokeNotes.add("Reset"); 
+        this.changeButtonName(drawButton, strokeNotes.get(drawStroke)); 
 
         drawButton.setOnAction(new EventHandler<ActionEvent>(){
             @Override 
@@ -78,8 +84,8 @@ public class Main extends Application{
                         gc.arc(400,400, 50, 25, 180, 300); 
                         gc.setFill(Color.GREEN);
                         gc.setStroke(Color.BLUE);
-                        gc.fill();
                         gc.stroke();
+                        gc.fill(); 
                         gc.closePath();  
 
                         gc.setFill(Color.YELLOW);
@@ -190,6 +196,102 @@ public class Main extends Application{
                         gc.stroke(); //outline
 
                         break;
+                    
+                    case "testOrderFillCloseStroke": 
+                        //SFC
+                        gc.beginPath();
+                        gc.arc(50,50, 25, 25, 180, 300); 
+                        gc.setFill(Color.GREEN);
+                        gc.setStroke(Color.BLUE);
+                        gc.stroke();
+                        gc.fill(); 
+                        gc.closePath();  
+                        
+                        //SCF 
+                        gc.beginPath();
+                        gc.arc(90,90, 25, 25, 180, 300); 
+                        gc.setFill(Color.PURPLE);
+                        gc.setStroke(Color.BLUE);   
+                        gc.stroke();
+                        gc.closePath();  
+                        gc.fill();    
+
+                        //FSC
+                        gc.beginPath();
+                        gc.arc(130,130, 25, 25, 180, 300); 
+                        gc.setFill(Color.YELLOW);
+                        gc.setStroke(Color.BLUE); 
+                        gc.fill(); 
+                        gc.stroke();
+                        gc.closePath();  
+
+                        //FCS 
+                        gc.beginPath();
+                        gc.arc(170,170, 25, 25, 180, 300); 
+                        gc.setFill(Color.RED);
+                        gc.setStroke(Color.BLUE); 
+                        gc.fill();  
+                        gc.closePath();  
+                        gc.stroke(); 
+                        
+                        //CFS 
+                        gc.beginPath();
+                        gc.arc(210,210, 25, 25, 180, 300); 
+                        gc.setFill(Color.ORANGE);
+                        gc.setStroke(Color.BLUE); 
+                        gc.closePath(); 
+                        gc.fill();    
+                        gc.stroke();
+
+                        //CSF 
+                        gc.beginPath();
+                        gc.arc(250,250, 25, 25, 180, 300); 
+                        gc.setFill(Color.GRAY);
+                        gc.setStroke(Color.BLUE); 
+                        gc.closePath();     
+                        gc.stroke();
+                        gc.fill(); 
+
+                        break;
+
+                    case "testArcFillStrokeVSArcFillArcFillStroke": 
+                        //SFC
+                        gc.beginPath();
+                        gc.arc(50,50, 25, 25, 180, 300); 
+                        gc.setFill(Color.GREEN);
+                        gc.setStroke(Color.BLUE);
+                        gc.stroke();
+                        gc.fill(); 
+                        gc.closePath();  
+                        
+                        gc.beginPath(); 
+                        gc.fillArc(100,50, 25, 25, 180, 300,ArcType.ROUND); 
+                        gc.strokeArc(50,100, 25, 25, 180, 300, ArcType.ROUND); 
+                        gc.fillArc(100,100, 25, 25, 180, 300,ArcType.ROUND); 
+                        gc.strokeArc(100,100, 25, 25, 180, 300, ArcType.ROUND); 
+                        gc.stroke();
+                        gc.fill(); 
+                        gc.closePath();  
+                        break;                        
+                    case "testArcTypes": 
+                        
+                        gc.beginPath();  
+                        gc.fillArc(50,50, 50, 50, 180, 300, ArcType.ROUND); 
+                        gc.strokeArc(50,50, 50, 50, 180, 300, ArcType.ROUND);
+                        //Test as it doesn't seem to be drawing... 
+                        gc.closePath();  
+                        
+                        gc.beginPath();  
+                        gc.fillArc(130,130, 50, 50, 180, 300, ArcType.CHORD); 
+                        gc.strokeArc(130,130, 50, 50, 180, 300, ArcType.CHORD);  
+                        gc.closePath();  
+                        
+                        gc.beginPath();  
+                        gc.fillArc(210,210, 50, 50, 180, 300, ArcType.OPEN); 
+                        gc.strokeArc(210,210, 50, 50, 180, 300, ArcType.OPEN);  
+                        gc.closePath();  
+                        break;
+
                     case "Reset":
                         double width=testPixelControl.getCanvas().getWidth(); 
                         double height=testPixelControl.getCanvas().getHeight(); 
